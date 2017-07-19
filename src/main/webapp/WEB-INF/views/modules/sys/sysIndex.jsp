@@ -17,6 +17,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			// <c:if test="${tabmode eq '1'}"> 初始化页签
+			//$.fn是jQuery的标签页插件，可以轻松实现动态添加, 删除, 激活tab, 当tab页过多时会在左右两段增加滚动条
 			$.fn.initJerichoTab({
                 renderTo: '#right', uniqueId: 'jerichotab',
                 contentCss: { 'height': $('#right').height() - tabTitleHeight },

@@ -8,6 +8,7 @@
 <%@ taglib prefix="sys" tagdir="/WEB-INF/tags/sys" %>
 <%@ taglib prefix="act" tagdir="/WEB-INF/tags/act" %>
 <%@ taglib prefix="cms" tagdir="/WEB-INF/tags/cms" %>
+<!-- 但是存在循环引用，这里引用了cms，cms里面又引用了cms/front/include/taglib.jsp，就是这个文件本身 -->
 <c:set var="ctx" value="${pageContext.request.contextPath}${fns:getFrontPath()}"/>
 <c:set var="ctxStatic" value="${pageContext.request.contextPath}/static"/>
 <c:set var="ctxStaticFront" value="${ctxStatic}/modules/cms/front"/>
