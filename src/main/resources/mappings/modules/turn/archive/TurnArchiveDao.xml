@@ -5,6 +5,7 @@
 	<sql id="turnArchiveColumns">
 		a.id AS "id",
 		a.archive_name AS "archiveName",
+		a.is_open AS "isOpen",
 		a.create_by AS "createBy.id",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
@@ -33,6 +34,9 @@
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="archiveName != null and archiveName != ''">
 				AND a.archive_name = #{archiveName}
+			</if>
+			<if test="isOpen != null and isOpen != ''">
+				AND a.is_open = #{isOpen}
 			</if>
 			<if test="beginCreateDate != null and endCreateDate != null and beginCreateDate != '' and endCreateDate != ''">
 				AND a.create_date BETWEEN #{beginCreateDate} AND #{endCreateDate}
@@ -73,6 +77,7 @@
 		INSERT INTO turn_archive(
 			id,
 			archive_name,
+			is_open,
 			create_by,
 			create_date,
 			update_by,
@@ -82,6 +87,7 @@
 		) VALUES (
 			#{id},
 			#{archiveName},
+			#{isOpen},
 			#{createBy.id},
 			#{createDate},
 			#{updateBy.id},
@@ -94,6 +100,7 @@
 	<update id="update">
 		UPDATE turn_archive SET 	
 			archive_name = #{archiveName},
+			is_open = #{isOpen},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks}

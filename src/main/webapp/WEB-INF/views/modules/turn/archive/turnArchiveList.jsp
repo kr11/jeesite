@@ -28,6 +28,9 @@
 			<li><label>存档名：</label>
 				<form:input path="archiveName" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
+			<li><label>是否开启：</label>
+				<form:radiobuttons path="isOpen" items="${fns:getDictList('is_archive_open')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+			</li>
 			<li><label>创建时间：</label>
 				<input name="beginCreateDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${turnArchive.beginCreateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
@@ -53,6 +56,7 @@
 		<thead>
 			<tr>
 				<th>存档名</th>
+				<th>是否开启</th>
 				<th>创建时间</th>
 				<th>最后更新时间</th>
 				<th>备注信息</th>
@@ -65,6 +69,9 @@
 				<td><a href="${ctx}/turn/archive/turnArchive/form?id=${turnArchive.id}">
 					${turnArchive.archiveName}
 				</a></td>
+				<td>
+					${fns:getDictLabel(turnArchive.isOpen, 'is_archive_open', '')}
+				</td>
 				<td>
 					<fmt:formatDate value="${turnArchive.createDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
 				</td>

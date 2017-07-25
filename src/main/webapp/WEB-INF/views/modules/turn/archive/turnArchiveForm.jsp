@@ -41,6 +41,13 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">是否开启：</label>
+			<div class="controls">
+				<form:radiobuttons path="isOpen" items="${fns:getDictList('is_archive_open')}" itemLabel="label" itemValue="value" htmlEscape="false" class="required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">备注信息：</label>
 			<div class="controls">
 				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>

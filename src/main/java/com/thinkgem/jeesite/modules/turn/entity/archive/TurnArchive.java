@@ -17,6 +17,7 @@ public class TurnArchive extends DataEntity<TurnArchive> {
 	
 	private static final long serialVersionUID = 1L;
 	private String archiveName;		// 存档名
+	private String isOpen;		// 是否开启
 	private Date beginCreateDate;		// 开始 创建时间
 	private Date endCreateDate;		// 结束 创建时间
 	private Date beginUpdateDate;		// 开始 最后更新时间
@@ -37,6 +38,22 @@ public class TurnArchive extends DataEntity<TurnArchive> {
 
 	public void setArchiveName(String archiveName) {
 		this.archiveName = archiveName;
+	}
+	
+	@Length(min=1, max=1, message="是否开启长度必须介于 1 和 1 之间")
+	public String getIsOpen() {
+		return isOpen;
+	}
+
+	public boolean getBooleanIsOpen() {
+		return "1".equals(isOpen);
+	}
+	public void setBooleanIsOpen(boolean f) {
+		this.isOpen = f ? "1" : "0";
+	}
+
+	public void setIsOpen(String isOpen) {
+		this.isOpen = isOpen;
 	}
 	
 	public Date getBeginCreateDate() {
