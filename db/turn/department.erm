@@ -146,7 +146,7 @@
 			</connections>
 			<display>false</display>
 			<creation_date>2017-07-19 14:28:35</creation_date>
-			<updated_date>2017-07-25 23:17:38</updated_date>
+			<updated_date>2017-07-26 08:01:29</updated_date>
 			<model_property>
 				<name>Project Name</name>
 				<value></value>
@@ -412,7 +412,7 @@
 			</connections>
 			<physical_name>turn_department</physical_name>
 			<logical_name>排班-科室数据表</logical_name>
-			<description>业务数据表</description>
+			<description>部门表</description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
 			<option></option>

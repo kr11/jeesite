@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.turn.dao.department.TurnDepartmentDao">
+    
+	<sql id="turnDepartmentColumns">
+		a.id AS "id",
+		a.archive_id AS "belongArchiveId",
+		a.department_name AS "departmentName",
+		a.practice_class AS "practiceClass",
+		a.is_used AS "isUsed",
+		a.exchange_department AS "exchangeDepartmentId",
+		a.now_alias AS "nowAliasName",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="turnDepartmentJoins">
+	</sql>
+    
+	<select id="get" resultType="TurnDepartment">
+		SELECT 
+			<include refid="turnDepartmentColumns"/>
+		FROM turn_department a
+		<include refid="turnDepartmentJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TurnDepartment">
+		SELECT 
+			<include refid="turnDepartmentColumns"/>
+		FROM turn_department a
+		<include refid="turnDepartmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TurnDepartment">
+		SELECT 
+			<include refid="turnDepartmentColumns"/>
+		FROM turn_department a
+		<include refid="turnDepartmentJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO turn_department(
+			id,
+			archive_id,
+			department_name,
+			practice_class,
+			is_used,
+			exchange_department,
+			now_alias,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{belongArchiveId},
+			#{departmentName},
+			#{practiceClass},
+			#{isUsed},
+			#{exchangeDepartmentId},
+			#{nowAliasName},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE turn_department SET 	
+			department_name = #{departmentName},
+			practice_class = #{practiceClass},
+			is_used = #{isUsed},
+			exchange_department = #{exchangeDepartmentId},
+			now_alias = #{nowAliasName},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE turn_department SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
