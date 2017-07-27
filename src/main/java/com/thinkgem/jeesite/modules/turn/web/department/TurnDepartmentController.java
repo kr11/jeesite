@@ -22,10 +22,12 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.service.department.TurnDepartmentService;
 
+import java.util.List;
+
 /**
  * 排班科室表Controller
  * @author Carrel
- * @version 2017-07-26
+ * @version 2017-07-27
  */
 @Controller
 @RequestMapping(value = "${adminPath}/turn/department/turnDepartment")
@@ -54,12 +56,11 @@ public class TurnDepartmentController extends BaseController {
 		return "modules/turn/department/turnDepartmentList";
 	}
 
-//	@RequiresPermissions("turn:
-	
-
 	@RequiresPermissions("turn:department:turnDepartment:view")
 	@RequestMapping(value = "form")
 	public String form(TurnDepartment turnDepartment, Model model) {
+		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList();
+		model.addAttribute("departmentList", depList);
 		model.addAttribute("turnDepartment", turnDepartment);
 		return "modules/turn/department/turnDepartmentForm";
 	}

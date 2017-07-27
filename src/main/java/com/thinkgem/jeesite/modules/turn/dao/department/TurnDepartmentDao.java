@@ -10,7 +10,7 @@ import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 /**
  * 排班科室表DAO接口
  * @author Carrel
- * @version 2017-07-26
+ * @version 2017-07-27
  */
 @MyBatisDao
 public interface TurnDepartmentDao extends CrudDao<TurnDepartment> {

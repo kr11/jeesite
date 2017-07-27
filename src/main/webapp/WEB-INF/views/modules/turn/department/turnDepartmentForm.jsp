@@ -41,31 +41,41 @@
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">实习所属大类：</label>
+			<label class="control-label">所属大类：</label>
 			<div class="controls">
-				<form:input path="practiceClass" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
+				<form:select path="practiceClass" class="input-xlarge required">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('turn_practice_class')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">是否启用：</label>
 			<div class="controls">
-				<form:input path="isUsed" htmlEscape="false" maxlength="1" class="input-xlarge required"/>
+				<form:select path="isUsed" class="input-xlarge required">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">可互换科室编号：</label>
+			<label class="control-label">可换科室：</label>
 			<div class="controls">
-				<form:input path="exchangeDepartmentId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
-				<span class="help-inline"><font color="red">*</font> </span>
+				<%--<form:input path="exchangeDepartmentId" htmlEscape="false" maxlength="64" class="input-xlarge "/>--%>
+				<form:select path="exchangeDepartmentId" class="input-xlarge">
+					<form:options items="${departmentList}" itemLabel="departmentName" itemValue="exchangeDepartmentId" htmlEscape="false"/>
+				</form:select>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">科室变迁现在名字：</label>
+			<label class="control-label">科室现名：</label>
 			<div class="controls">
-				<form:input path="nowAliasName" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
-				<span class="help-inline"><font color="red">*</font> </span>
+				<%--<form:input path="nowAliasName" htmlEscape="false" maxlength="64" class="input-xlarge "/>--%>
+				<form:select path="nowAliasName" class="input-xlarge">
+					<form:options items="${departmentList}" itemLabel="departmentName" itemValue="nowAliasName" htmlEscape="false"/>
+				</form:select>
 			</div>
 		</div>
 		<div class="control-group">

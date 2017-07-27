@@ -36,6 +36,21 @@
 		<include refid="turnDepartmentJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="departmentName != null and departmentName != ''">
+				AND a.department_name = #{departmentName}
+			</if>
+			<if test="practiceClass != null and practiceClass != ''">
+				AND a.practice_class = #{practiceClass}
+			</if>
+			<if test="isUsed != null and isUsed != ''">
+				AND a.is_used = #{isUsed}
+			</if>
+			<if test="exchangeDepartmentId != null and exchangeDepartmentId != ''">
+				AND a.exchange_department = #{exchangeDepartmentId}
+			</if>
+			<if test="nowAliasName != null and nowAliasName != ''">
+				AND a.now_alias = #{nowAliasName}
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">

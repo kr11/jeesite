@@ -10,7 +10,7 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 /**
  * 排班科室表Entity
  * @author Carrel
- * @version 2017-07-26
+ * @version 2017-07-27
  */
 public class TurnDepartment extends DataEntity<TurnDepartment> {
 	
@@ -65,8 +65,12 @@ public class TurnDepartment extends DataEntity<TurnDepartment> {
 	public void setIsUsed(String isUsed) {
 		this.isUsed = isUsed;
 	}
-	
-	@Length(min=1, max=64, message="可互换科室编号长度必须介于 1 和 64 之间")
+
+	public void setBooleanIsUsed(boolean booleanIsUsed) {
+		this.isUsed = booleanIsUsed ? "1": "0";
+	}
+
+	@Length(min=0, max=64, message="可互换科室编号长度必须介于 0 和 64 之间")
 	public String getExchangeDepartmentId() {
 		return exchangeDepartmentId;
 	}
@@ -75,7 +79,7 @@ public class TurnDepartment extends DataEntity<TurnDepartment> {
 		this.exchangeDepartmentId = exchangeDepartmentId;
 	}
 	
-	@Length(min=1, max=64, message="科室变迁现在名字长度必须介于 1 和 64 之间")
+	@Length(min=0, max=64, message="科室变迁现在名字长度必须介于 0 和 64 之间")
 	public String getNowAliasName() {
 		return nowAliasName;
 	}

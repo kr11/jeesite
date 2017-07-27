@@ -25,6 +25,27 @@
 		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
 		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
 		<ul class="ul-form">
+			<li><label>科室名：</label>
+				<form:input path="departmentName" htmlEscape="false" maxlength="64" class="input-medium"/>
+			</li>
+			<li><label>实习所属大类：</label>
+				<form:select path="practiceClass" class="input-medium">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('turn_practice_class')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>是否启用：</label>
+				<form:select path="isUsed" class="input-medium">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
+			<li><label>可互换科室编号：</label>
+				<form:input path="exchangeDepartmentId" htmlEscape="false" maxlength="64" class="input-medium"/>
+			</li>
+			<li><label>科室变迁现在名字：</label>
+				<form:input path="nowAliasName" htmlEscape="false" maxlength="64" class="input-medium"/>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="clearfix"></li>
 		</ul>
@@ -33,8 +54,11 @@
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
 		<thead>
 			<tr>
-				<th>更新时间</th>
-				<th>备注信息</th>
+				<th>科室名</th>
+				<th>实习所属大类</th>
+				<th>是否启用</th>
+				<th>可互换科室编号</th>
+				<th>科室变迁现在名字</th>
 				<shiro:hasPermission name="turn:department:turnDepartment:edit"><th>操作</th></shiro:hasPermission>
 			</tr>
 		</thead>
@@ -42,10 +66,19 @@
 		<c:forEach items="${page.list}" var="turnDepartment">
 			<tr>
 				<td><a href="${ctx}/turn/department/turnDepartment/form?id=${turnDepartment.id}">
-					<fmt:formatDate value="${turnDepartment.updateDate}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					${turnDepartment.departmentName}
 				</a></td>
 				<td>
-					${turnDepartment.remarks}
+					${fns:getDictLabel(turnDepartment.practiceClass, 'turn_practice_class', '')}
+				</td>
+				<td>
+					${fns:getDictLabel(turnDepartment.isUsed, 'yes_no', '')}
+				</td>
+				<td>
+					${turnDepartment.exchangeDepartmentId}
+				</td>
+				<td>
+					${turnDepartment.nowAliasName}
 				</td>
 				<shiro:hasPermission name="turn:department:turnDepartment:edit"><td>
     				<a href="${ctx}/turn/department/turnDepartment/form?id=${turnDepartment.id}">修改</a>
