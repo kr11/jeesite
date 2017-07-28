@@ -60,6 +60,9 @@ public class TurnDepartmentController extends BaseController {
 	@RequestMapping(value = "form")
 	public String form(TurnDepartment turnDepartment, Model model) {
 		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList();
+		TurnDepartment zero = new TurnDepartment();
+		zero.setDepartmentName("");
+		depList.add(0,zero);
 		model.addAttribute("departmentList", depList);
 		model.addAttribute("turnDepartment", turnDepartment);
 		return "modules/turn/department/turnDepartmentForm";

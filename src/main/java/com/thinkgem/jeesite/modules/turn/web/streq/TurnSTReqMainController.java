@@ -6,6 +6,8 @@ package com.thinkgem.jeesite.modules.turn.web.streq;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
+import com.thinkgem.jeesite.modules.turn.service.department.TurnDepartmentService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,8 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.service.streq.TurnSTReqMainService;
 
+import java.util.List;
+
 /**
  * 排班-规培标准表Controller
  * @author Carrel
@@ -33,6 +37,8 @@ public class TurnSTReqMainController extends BaseController {
 
 	@Autowired
 	private TurnSTReqMainService turnSTReqMainService;
+	@Autowired
+	private TurnDepartmentService turnDepartmentService;
 	
 	@ModelAttribute
 	public TurnSTReqMain get(@RequestParam(required=false) String id) {
@@ -58,6 +64,10 @@ public class TurnSTReqMainController extends BaseController {
 	@RequestMapping(value = "form")
 	public String form(TurnSTReqMain turnSTReqMain, Model model) {
 		model.addAttribute("turnSTReqMain", turnSTReqMain);
+		TurnDepartment turnDepartment = new TurnDepartment();
+		turnDepartment.setBooleanIsUsed(true);
+		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList(turnDepartment);
+		model.addAttribute("departmentList", depList);
 		return "modules/turn/streq/turnSTReqMainForm";
 	}
 

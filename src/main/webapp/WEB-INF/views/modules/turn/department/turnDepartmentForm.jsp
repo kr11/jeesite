@@ -64,18 +64,27 @@
 			<label class="control-label">可换科室：</label>
 			<div class="controls">
 				<%--<form:input path="exchangeDepartmentId" htmlEscape="false" maxlength="64" class="input-xlarge "/>--%>
+				<%--<form:select path="exchangeDepartmentId" class="input-xlarge">--%>
+					<%--<form:options items="${departmentList}" itemLabel="departmentName" itemValue="exchangeDepartmentId" htmlEscape="false"/>--%>
+				<%--</form:select>--%>
 				<form:select path="exchangeDepartmentId" class="input-xlarge">
-					<form:options items="${departmentList}" itemLabel="departmentName" itemValue="exchangeDepartmentId" htmlEscape="false"/>
+					<form:option value="" label=""/>
+					<form:options items="${departmentList}" itemLabel="departmentName" itemValue="departmentName" htmlEscape="false"/>
 				</form:select>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">科室现名：</label>
 			<div class="controls">
+				<option value=""></option>
 				<%--<form:input path="nowAliasName" htmlEscape="false" maxlength="64" class="input-xlarge "/>--%>
-				<form:select path="nowAliasName" class="input-xlarge">
-					<form:options items="${departmentList}" itemLabel="departmentName" itemValue="nowAliasName" htmlEscape="false"/>
-				</form:select>
+				<%--<form:select path="nowAliasName" class="input-xlarge">--%>
+					<%--<form:options items="${departmentList}" itemLabel="departmentName" itemValue="nowAliasName" htmlEscape="false"/>--%>
+				<%--</form:select>--%>
+                <form:select path="nowAliasName" class="input-xlarge">
+                    <form:option value="" label=""/>
+                    <form:options items="${departmentList}" itemLabel="departmentName" itemValue="departmentName" htmlEscape="false"/>
+                </form:select>
 			</div>
 		</div>
 		<div class="control-group">

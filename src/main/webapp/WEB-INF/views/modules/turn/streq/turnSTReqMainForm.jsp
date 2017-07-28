@@ -71,13 +71,13 @@
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label">所属存档id：</label>
-			<div class="controls">
-				<form:input path="archiveId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
-				<span class="help-inline"><font color="red">*</font> </span>
-			</div>
-		</div>
+		<%--<div class="control-group">--%>
+			<%--<label class="control-label">所属存档id：</label>--%>
+			<%--<div class="controls">--%>
+				<%--<form:input path="archiveId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>--%>
+				<%--<span class="help-inline"><font color="red">*</font> </span>--%>
+			<%--</div>--%>
+		<%--</div>--%>
 		<div class="control-group">
 			<label class="control-label">总时长：</label>
 			<div class="controls">
@@ -128,8 +128,8 @@
 							<td>
 								<select id="turnSTReqChildList{{idx}}_departmentName" name="turnSTReqChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}" class="input-small required">
 									<option value=""></option>
-									<c:forEach items="${fns:getDictList('cms_show_modes')}" var="dict">
-										<option value="${dict.value}">${dict.label}</option>
+									<c:forEach items="${departmentList}" var="dep">
+										<option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
 									</c:forEach>
 								</select>
 							</td>

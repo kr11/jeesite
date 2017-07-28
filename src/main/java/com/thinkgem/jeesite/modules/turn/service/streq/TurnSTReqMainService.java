@@ -60,11 +60,11 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
 				continue;
 			}
 			if (TurnSTReqChild.DEL_FLAG_NORMAL.equals(turnSTReqChild.getDelFlag())){
-				if (StringUtils.isBlank(turnSTReqChild.getId())){
+                String[] idAndNames = turnSTReqChild.getDepartmentName().split("@");
+                turnSTReqChild.setDepartmentId(idAndNames[0]);
+                if (StringUtils.isBlank(turnSTReqChild.getId())){
 					turnSTReqChild.setRequirementId(turnSTReqMain);
-					//temp
-                    turnSTReqChild.setDepartmentId("50d3281efa7c435dacc41fff474c9d5c");
-					turnSTReqChild.preInsert();
+                    turnSTReqChild.preInsert();
 					turnSTReqChildDao.insert(turnSTReqChild);
 				}else{
 					turnSTReqChild.preUpdate();
