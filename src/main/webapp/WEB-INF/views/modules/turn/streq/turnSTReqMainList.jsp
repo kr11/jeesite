@@ -40,6 +40,8 @@
 		<thead>
 			<tr>
 				<th>规培标准名</th>
+				<th>开始时间</th>
+				<th>结束时间</th>
 				<th>总时长</th>
 				<th>更新时间</th>
 				<th>备注信息</th>
@@ -52,6 +54,12 @@
 				<td><a href="${ctx}/turn/streq/turnSTReqMain/form?id=${turnSTReqMain.id}">
 					${turnSTReqMain.name}
 				</a></td>
+				<td>
+					${turnSTReqMain.startYAtM}
+				</td>
+				<td>
+					${turnSTReqMain.endYAtM}
+				</td>
 				<td>
 					${turnSTReqMain.totalLength}
 				</td>

@@ -72,6 +72,20 @@
 			</div>
 		</div>
 		<div class="control-group">
+			<label class="control-label">开始时间(YYYY-MM)：</label>
+			<div class="controls">
+				<form:input path="startYAtM" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">结束时间(YYYY-MM)：</label>
+			<div class="controls">
+				<form:input path="endYAtM" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
+		<div class="control-group">
 			<label class="control-label">总时长：</label>
 			<div class="controls">
 				<form:input path="totalLength" htmlEscape="false" maxlength="64" class="input-xlarge required digits"/>

@@ -20,6 +20,8 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 	private static final long serialVersionUID = 1L;
 	private String name;		// 规培标准名
 	private String archiveId;		// 所属存档id
+	private String startYAtM;		// 开始时间
+	private String endYAtM;		// 结束时间
 	private Integer totalLength;		// 总时长
 	private String timgUnit;		// 时间单位
 	private List<TurnSTReqDepChild> turnSTReqDepChildList = Lists.newArrayList();		// 子表列表
@@ -49,6 +51,24 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 
 	public void setArchiveId(String archiveId) {
 		this.archiveId = archiveId;
+	}
+	
+	@Length(min=1, max=64, message="开始时间长度必须介于 1 和 64 之间")
+	public String getStartYAtM() {
+		return startYAtM;
+	}
+
+	public void setStartYAtM(String startYAtM) {
+		this.startYAtM = startYAtM;
+	}
+	
+	@Length(min=1, max=64, message="结束时间长度必须介于 1 和 64 之间")
+	public String getEndYAtM() {
+		return endYAtM;
+	}
+
+	public void setEndYAtM(String endYAtM) {
+		this.endYAtM = endYAtM;
 	}
 	
 	@NotNull(message="总时长不能为空")
