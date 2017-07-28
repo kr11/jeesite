@@ -146,7 +146,7 @@
 			</connections>
 			<display>false</display>
 			<creation_date>2017-07-19 14:28:35</creation_date>
-			<updated_date>2017-07-26 08:01:29</updated_date>
+			<updated_date>2017-07-28 17:29:27</updated_date>
 			<model_property>
 				<name>Project Name</name>
 				<value></value>
@@ -258,9 +258,9 @@
 			<binary>false</binary>
 			<args></args>
 			<char_semantics>false</char_semantics>
-			<description>科室名</description>
-			<logical_name>科室名</logical_name>
-			<physical_name>department_name</physical_name>
+			<description>科室id</description>
+			<logical_name>科室id</logical_name>
+			<physical_name>dep_id</physical_name>
 			<type>varchar(n)</type>
 		</word>
 		<word>
@@ -274,13 +274,29 @@
 			<binary>false</binary>
 			<args></args>
 			<char_semantics>false</char_semantics>
-			<description>可互换科室编号</description>
-			<logical_name>可互换科室编号</logical_name>
-			<physical_name>exchange_department</physical_name>
+			<description>科室名</description>
+			<logical_name>科室名</logical_name>
+			<physical_name>dep_name</physical_name>
 			<type>varchar(n)</type>
 		</word>
 		<word>
 			<id>6</id>
+			<length>64</length>
+			<decimal>null</decimal>
+			<array>false</array>
+			<array_dimension>null</array_dimension>
+			<unsigned>true</unsigned>
+			<zerofill>false</zerofill>
+			<binary>false</binary>
+			<args></args>
+			<char_semantics>false</char_semantics>
+			<description>结束时间半月整数</description>
+			<logical_name>结束时间半月整数</logical_name>
+			<physical_name>end_int</physical_name>
+			<type>int(n)</type>
+		</word>
+		<word>
+			<id>7</id>
 			<length>64</length>
 			<decimal>null</decimal>
 			<array>false</array>
@@ -296,55 +312,7 @@
 			<type>varchar(n)</type>
 		</word>
 		<word>
-			<id>7</id>
-			<length>1</length>
-			<decimal>null</decimal>
-			<array>false</array>
-			<array_dimension>null</array_dimension>
-			<unsigned>false</unsigned>
-			<zerofill>false</zerofill>
-			<binary>false</binary>
-			<args></args>
-			<char_semantics>false</char_semantics>
-			<description>是否开启</description>
-			<logical_name>是否开启</logical_name>
-			<physical_name>is_used</physical_name>
-			<type>character(n)</type>
-		</word>
-		<word>
 			<id>8</id>
-			<length>64</length>
-			<decimal>null</decimal>
-			<array>false</array>
-			<array_dimension>null</array_dimension>
-			<unsigned>false</unsigned>
-			<zerofill>false</zerofill>
-			<binary>false</binary>
-			<args></args>
-			<char_semantics>false</char_semantics>
-			<description>科室变迁现在名字</description>
-			<logical_name>科室变迁现在名字</logical_name>
-			<physical_name>now_alias</physical_name>
-			<type>varchar(n)</type>
-		</word>
-		<word>
-			<id>9</id>
-			<length>64</length>
-			<decimal>null</decimal>
-			<array>false</array>
-			<array_dimension>null</array_dimension>
-			<unsigned>false</unsigned>
-			<zerofill>false</zerofill>
-			<binary>false</binary>
-			<args></args>
-			<char_semantics>false</char_semantics>
-			<description>实习所属大类</description>
-			<logical_name>实习所属大类</logical_name>
-			<physical_name>practice_class</physical_name>
-			<type>varchar(n)</type>
-		</word>
-		<word>
-			<id>10</id>
 			<length>255</length>
 			<decimal>null</decimal>
 			<array>false</array>
@@ -358,6 +326,38 @@
 			<logical_name>备注信息</logical_name>
 			<physical_name>remarks</physical_name>
 			<type>nvarchar(n)</type>
+		</word>
+		<word>
+			<id>9</id>
+			<length>64</length>
+			<decimal>null</decimal>
+			<array>false</array>
+			<array_dimension>null</array_dimension>
+			<unsigned>false</unsigned>
+			<zerofill>false</zerofill>
+			<binary>false</binary>
+			<args></args>
+			<char_semantics>false</char_semantics>
+			<description>所属标准id</description>
+			<logical_name>所属标准id</logical_name>
+			<physical_name>requirement_id</physical_name>
+			<type>varchar(n)</type>
+		</word>
+		<word>
+			<id>10</id>
+			<length>64</length>
+			<decimal>null</decimal>
+			<array>false</array>
+			<array_dimension>null</array_dimension>
+			<unsigned>true</unsigned>
+			<zerofill>false</zerofill>
+			<binary>false</binary>
+			<args></args>
+			<char_semantics>false</char_semantics>
+			<description>开始时间半月整数</description>
+			<logical_name>开始时间半月整数</logical_name>
+			<physical_name>start_int</physical_name>
+			<type>int(n)</type>
 		</word>
 		<word>
 			<id>11</id>
@@ -391,6 +391,38 @@
 			<physical_name>update_date</physical_name>
 			<type>datetime</type>
 		</word>
+		<word>
+			<id>13</id>
+			<length>64</length>
+			<decimal>null</decimal>
+			<array>false</array>
+			<array_dimension>null</array_dimension>
+			<unsigned>false</unsigned>
+			<zerofill>false</zerofill>
+			<binary>false</binary>
+			<args></args>
+			<char_semantics>false</char_semantics>
+			<description>用户id</description>
+			<logical_name>用户id</logical_name>
+			<physical_name>user_id</physical_name>
+			<type>varchar(n)</type>
+		</word>
+		<word>
+			<id>14</id>
+			<length>64</length>
+			<decimal>null</decimal>
+			<array>false</array>
+			<array_dimension>null</array_dimension>
+			<unsigned>false</unsigned>
+			<zerofill>false</zerofill>
+			<binary>false</binary>
+			<args></args>
+			<char_semantics>false</char_semantics>
+			<description>用户名&#x0A;</description>
+			<logical_name>用户名</logical_name>
+			<physical_name>user_name</physical_name>
+			<type>varchar(n)</type>
+		</word>
 	</dictionary>
 	<tablespace_set>
 	</tablespace_set>
@@ -401,7 +433,7 @@
 			<width>263</width>
 				<font_name>Segoe UI</font_name>
 				<font_size>9</font_size>
-			<x>286</x>
+			<x>96</x>
 			<y>48</y>
 			<color>
 				<r>128</r>
@@ -410,15 +442,15 @@
 			</color>
 			<connections>
 			</connections>
-			<physical_name>turn_department</physical_name>
-			<logical_name>排班-科室数据表</logical_name>
-			<description>部门表</description>
+			<physical_name>turn_st_schedule</physical_name>
+			<logical_name>排班-规培调度数据表</logical_name>
+			<description>排班-调度数据表</description>
 			<constraint></constraint>
 			<primary_key_name></primary_key_name>
 			<option></option>
 			<columns>
 				<normal_column>
-					<word_id>6</word_id>
+					<word_id>7</word_id>
 					<id>6</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -484,7 +516,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>4</word_id>
+					<word_id>13</word_id>
 					<id>8</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -517,7 +549,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>9</word_id>
+					<word_id>14</word_id>
 					<id>9</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -550,13 +582,13 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>7</word_id>
+					<word_id>9</word_id>
 					<id>10</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
-					<type>character(n)</type>
+					<type>varchar(n)</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -583,7 +615,7 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>5</word_id>
+					<word_id>4</word_id>
 					<id>11</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
@@ -616,13 +648,79 @@
 					</sequence>
 				</normal_column>
 				<normal_column>
-					<word_id>8</word_id>
+					<word_id>5</word_id>
 					<id>12</id>
 					<description></description>
 					<unique_key_name></unique_key_name>
 					<logical_name></logical_name>
 					<physical_name></physical_name>
 					<type>varchar(n)</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>10</word_id>
+					<id>13</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>int(n)</type>
+					<constraint></constraint>
+					<default_value></default_value>
+					<auto_increment>false</auto_increment>
+					<foreign_key>false</foreign_key>
+					<not_null>true</not_null>
+					<primary_key>false</primary_key>
+					<unique_key>false</unique_key>
+					<character_set></character_set>
+					<collation></collation>
+					<sequence>
+						<name></name>
+						<schema></schema>
+						<increment></increment>
+						<min_value></min_value>
+						<max_value></max_value>
+						<start></start>
+						<cache></cache>
+						<nocache>false</nocache>
+						<cycle>false</cycle>
+						<order>false</order>
+						<description></description>
+						<data_type></data_type>
+						<decimal_size>0</decimal_size>
+					</sequence>
+				</normal_column>
+				<normal_column>
+					<word_id>6</word_id>
+					<id>14</id>
+					<description></description>
+					<unique_key_name></unique_key_name>
+					<logical_name></logical_name>
+					<physical_name></physical_name>
+					<type>int(n)</type>
 					<constraint></constraint>
 					<default_value></default_value>
 					<auto_increment>false</auto_increment>
@@ -810,7 +908,7 @@
 						</sequence>
 					</normal_column>
 					<normal_column>
-						<word_id>10</word_id>
+						<word_id>8</word_id>
 						<id>4</id>
 						<description></description>
 						<unique_key_name></unique_key_name>
