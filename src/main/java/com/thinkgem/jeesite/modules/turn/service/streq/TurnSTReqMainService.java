@@ -86,6 +86,8 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
 			if (TurnSTReqUserChild.DEL_FLAG_NORMAL.equals(turnSTReqUserChild.getDelFlag())){
 				if (StringUtils.isBlank(turnSTReqUserChild.getId())){
 					turnSTReqUserChild.setRequirementId(turnSTReqMain);
+					//temp：临时添加，用户userid=这个表里的id
+                    turnSTReqUserChild.setUserId(turnSTReqUserChild.getId());
 					turnSTReqUserChild.preInsert();
 					turnSTReqUserChildDao.insert(turnSTReqUserChild);
 				}else{
