@@ -22,7 +22,8 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 	private String archiveId;		// 所属存档id
 	private Integer totalLength;		// 总时长
 	private String timgUnit;		// 时间单位
-	private List<TurnSTReqChild> turnSTReqChildList = Lists.newArrayList();		// 子表列表
+	private List<TurnSTReqDepChild> turnSTReqDepChildList = Lists.newArrayList();		// 子表列表
+	private List<TurnSTReqUserChild> turnSTReqUserChildList = Lists.newArrayList();		// 子表列表
 	
 	public TurnSTReqMain() {
 		super();
@@ -68,15 +69,18 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 		this.timgUnit = timgUnit;
 	}
 	
-	public List<TurnSTReqChild> getTurnSTReqChildList() {
-		return turnSTReqChildList;
+	public List<TurnSTReqDepChild> getTurnSTReqDepChildList() {
+		return turnSTReqDepChildList;
 	}
 
-	public void setTurnSTReqChildList(List<TurnSTReqChild> turnSTReqChildList) {
-		this.turnSTReqChildList = turnSTReqChildList;
+	public void setTurnSTReqDepChildList(List<TurnSTReqDepChild> turnSTReqDepChildList) {
+		this.turnSTReqDepChildList = turnSTReqDepChildList;
 	}
-	@Override
-	public String toString() {
-		return id;
+	public List<TurnSTReqUserChild> getTurnSTReqUserChildList() {
+		return turnSTReqUserChildList;
+	}
+
+	public void setTurnSTReqUserChildList(List<TurnSTReqUserChild> turnSTReqUserChildList) {
+		this.turnSTReqUserChildList = turnSTReqUserChildList;
 	}
 }

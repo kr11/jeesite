@@ -102,7 +102,7 @@
 			</div>
 		</div>
 			<div class="control-group">
-				<label class="control-label">排班_规培标准数据表子表：</label>
+				<label class="control-label">科室列表：</label>
 				<div class="controls">
 					<table id="contentTable" class="table table-striped table-bordered table-condensed">
 						<thead>
@@ -110,23 +110,24 @@
 								<th class="hide"></th>
 								<th>科室名</th>
 								<th>时间长度</th>
+								<th>备注信息</th>
 								<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><th width="10">&nbsp;</th></shiro:hasPermission>
 							</tr>
 						</thead>
-						<tbody id="turnSTReqChildList">
+						<tbody id="turnSTReqDepChildList">
 						</tbody>
 						<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><tfoot>
-							<tr><td colspan="4"><a href="javascript:" onclick="addRow('#turnSTReqChildList', turnSTReqChildRowIdx, turnSTReqChildTpl);turnSTReqChildRowIdx = turnSTReqChildRowIdx + 1;" class="btn">新增</a></td></tr>
+							<tr><td colspan="5"><a href="javascript:" onclick="addRow('#turnSTReqDepChildList', turnSTReqDepChildRowIdx, turnSTReqDepChildTpl);turnSTReqDepChildRowIdx = turnSTReqDepChildRowIdx + 1;" class="btn">新增</a></td></tr>
 						</tfoot></shiro:hasPermission>
 					</table>
-					<script type="text/template" id="turnSTReqChildTpl">//<!--
-						<tr id="turnSTReqChildList{{idx}}">
+					<script type="text/template" id="turnSTReqDepChildTpl">
+						<tr id="turnSTReqDepChildList{{idx}}">
 							<td class="hide">
-								<input id="turnSTReqChildList{{idx}}_id" name="turnSTReqChildList[{{idx}}].id" type="hidden" value="{{row.id}}"/>
-								<input id="turnSTReqChildList{{idx}}_delFlag" name="turnSTReqChildList[{{idx}}].delFlag" type="hidden" value="0"/>
+								<input id="turnSTReqDepChildList{{idx}}_id" name="turnSTReqDepChildList[{{idx}}].id" type="hidden" value="{{row.id}}"/>
+								<input id="turnSTReqDepChildList{{idx}}_delFlag" name="turnSTReqDepChildList[{{idx}}].delFlag" type="hidden" value="0"/>
 							</td>
 							<td>
-								<select id="turnSTReqChildList{{idx}}_departmentName" name="turnSTReqChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}" class="input-small required">
+								<select id="turnSTReqDepChildList{{idx}}_departmentName" name="turnSTReqDepChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}" class="input-small required">
 									<option value=""></option>
 									<c:forEach items="${departmentList}" var="dep">
 										<option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
@@ -134,20 +135,110 @@
 								</select>
 							</td>
 							<td>
-								<input id="turnSTReqChildList{{idx}}_timeLength" name="turnSTReqChildList[{{idx}}].timeLength" type="text" value="{{row.timeLength}}" maxlength="64" class="input-small required"/>
+								<input id="turnSTReqDepChildList{{idx}}_timeLength" name="turnSTReqDepChildList[{{idx}}].timeLength" type="text" value="{{row.timeLength}}" maxlength="64" class="input-small required"/>
+							</td>
+							<td>
+								<textarea id="turnSTReqDepChildList{{idx}}_remarks" name="turnSTReqDepChildList[{{idx}}].remarks" rows="4" maxlength="255" class="input-small ">{{row.remarks}}</textarea>
 							</td>
 							<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><td class="text-center" width="10">
-								{{#delBtn}}<span class="close" onclick="delRow(this, '#turnSTReqChildList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
+								{{#delBtn}}<span class="close" onclick="delRow(this, '#turnSTReqDepChildList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
 							</td></shiro:hasPermission>
-						</tr>//-->
+						</tr>
 					</script>
 					<script type="text/javascript">
-						var turnSTReqChildRowIdx = 0, turnSTReqChildTpl = $("#turnSTReqChildTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");
+						var turnSTReqDepChildRowIdx = 0, turnSTReqDepChildTpl = $("#turnSTReqDepChildTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");
 						$(document).ready(function() {
-							var data = ${fns:toJson(turnSTReqMain.turnSTReqChildList)};
+							var data = ${fns:toJson(turnSTReqMain.turnSTReqDepChildList)};
 							for (var i=0; i<data.length; i++){
-								addRow('#turnSTReqChildList', turnSTReqChildRowIdx, turnSTReqChildTpl, data[i]);
-								turnSTReqChildRowIdx = turnSTReqChildRowIdx + 1;
+								addRow('#turnSTReqDepChildList', turnSTReqDepChildRowIdx, turnSTReqDepChildTpl, data[i]);
+								turnSTReqDepChildRowIdx = turnSTReqDepChildRowIdx + 1;
+							}
+						});
+					</script>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label">排班_规培标准_人员子表：</label>
+				<div class="controls">
+					<table id="contentTable" class="table table-striped table-bordered table-condensed">
+						<thead>
+							<tr>
+								<th class="hide"></th>
+								<%--<th>人员系统id</th>--%>
+								<th>姓名</th>
+								<th>性别</th>
+								<th>学员编号</th>
+								<th>年级</th>
+								<th>学员性质</th>
+								<th>大组编号</th>
+								<th>备注信息</th>
+								<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><th width="10">&nbsp;</th></shiro:hasPermission>
+							</tr>
+						</thead>
+						<tbody id="turnSTReqUserChildList">
+						</tbody>
+						<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><tfoot>
+							<tr><td colspan="10"><a href="javascript:" onclick="addRow('#turnSTReqUserChildList', turnSTReqUserChildRowIdx, turnSTReqUserChildTpl);turnSTReqUserChildRowIdx = turnSTReqUserChildRowIdx + 1;" class="btn">新增</a></td></tr>
+						</tfoot></shiro:hasPermission>
+					</table>
+					<script type="text/template" id="turnSTReqUserChildTpl">
+						<tr id="turnSTReqUserChildList{{idx}}">
+							<td class="hide">
+								<input id="turnSTReqUserChildList{{idx}}_id" name="turnSTReqUserChildList[{{idx}}].id" type="hidden" value="{{row.id}}"/>
+								<input id="turnSTReqUserChildList{{idx}}_delFlag" name="turnSTReqUserChildList[{{idx}}].delFlag" type="hidden" value="0"/>
+							</td>
+							<td>
+								<sys:treeselect id="turnSTReqUserChildList{{idx}}_user" name="turnSTReqUserChildList[{{idx}}].user.id" value="{{row.user.id}}" labelName="turnSTReqUserChildList{{idx}}.user.name" labelValue="{{row.user.name}}"
+									title="用户" url="/sys/office/treeData?type=3" cssClass="required" allowClear="true" notAllowSelectParent="true"/>
+							</td>
+							<td>
+								<input id="turnSTReqUserChildList{{idx}}_userName" name="turnSTReqUserChildList[{{idx}}].userName" type="text" value="{{row.userName}}" maxlength="64" class="input-small required"/>
+							</td>
+							<td>
+								<select id="turnSTReqUserChildList{{idx}}_sex" name="turnSTReqUserChildList[{{idx}}].sex" data-value="{{row.sex}}" class="input-small required">
+									<option value=""></option>
+									<c:forEach items="${fns:getDictList('sex')}" var="dict">
+										<option value="${dict.value}">${dict.label}</option>
+									</c:forEach>
+								</select>
+							</td>
+							<td>
+								<input id="turnSTReqUserChildList{{idx}}_userNumber" name="turnSTReqUserChildList[{{idx}}].userNumber" type="text" value="{{row.userNumber}}" maxlength="64" class="input-small "/>
+							</td>
+							<td>
+								<select id="turnSTReqUserChildList{{idx}}_grade" name="turnSTReqUserChildList[{{idx}}].grade" data-value="{{row.grade}}" class="input-small ">
+									<option value=""></option>
+									<c:forEach items="${fns:getDictList('grade')}" var="dict">
+										<option value="${dict.value}">${dict.label}</option>
+									</c:forEach>
+								</select>
+							</td>
+							<td>
+								<select id="turnSTReqUserChildList{{idx}}_userClass" name="turnSTReqUserChildList[{{idx}}].userClass" data-value="{{row.userClass}}" class="input-small required">
+									<option value=""></option>
+									<c:forEach items="${fns:getDictList('user_class')}" var="dict">
+										<option value="${dict.value}">${dict.label}</option>
+									</c:forEach>
+								</select>
+							</td>
+							<td>
+								<input id="turnSTReqUserChildList{{idx}}_groupId" name="turnSTReqUserChildList[{{idx}}].groupId" type="text" value="{{row.groupId}}" maxlength="64" class="input-small "/>
+							</td>
+							<td>
+								<textarea id="turnSTReqUserChildList{{idx}}_remarks" name="turnSTReqUserChildList[{{idx}}].remarks" rows="4" maxlength="255" class="input-small ">{{row.remarks}}</textarea>
+							</td>
+							<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><td class="text-center" width="10">
+								{{#delBtn}}<span class="close" onclick="delRow(this, '#turnSTReqUserChildList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
+							</td></shiro:hasPermission>
+						</tr>
+					</script>
+					<script type="text/javascript">
+						var turnSTReqUserChildRowIdx = 0, turnSTReqUserChildTpl = $("#turnSTReqUserChildTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");
+						$(document).ready(function() {
+							var data = ${fns:toJson(turnSTReqMain.turnSTReqUserChildList)};
+							for (var i=0; i<data.length; i++){
+								addRow('#turnSTReqUserChildList', turnSTReqUserChildRowIdx, turnSTReqUserChildTpl, data[i]);
+								turnSTReqUserChildRowIdx = turnSTReqUserChildRowIdx + 1;
 							}
 						});
 					</script>

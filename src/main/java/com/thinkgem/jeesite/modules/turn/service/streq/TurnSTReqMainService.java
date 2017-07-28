@@ -16,8 +16,10 @@ import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao;
-import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqChild;
-import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqChildDao;
+import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
+import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqDepChildDao;
+import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
+import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao;
 
 /**
  * 排班-规培标准表Service
@@ -29,14 +31,17 @@ import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqChildDao;
 public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTReqMain> {
 
 	@Autowired
-	private TurnSTReqChildDao turnSTReqChildDao;
-
+	private TurnSTReqDepChildDao turnSTReqDepChildDao;
 	@Autowired
+	private TurnSTReqUserChildDao turnSTReqUserChildDao;
+
+    @Autowired
     private TurnArchiveDao turnArchiveDao;
 
     public TurnSTReqMain get(String id) {
 		TurnSTReqMain turnSTReqMain = super.get(id);
-		turnSTReqMain.setTurnSTReqChildList(turnSTReqChildDao.findList(new TurnSTReqChild(turnSTReqMain)));
+		turnSTReqMain.setTurnSTReqDepChildList(turnSTReqDepChildDao.findList(new TurnSTReqDepChild(turnSTReqMain)));
+		turnSTReqMain.setTurnSTReqUserChildList(turnSTReqUserChildDao.findList(new TurnSTReqUserChild(turnSTReqMain)));
 		return turnSTReqMain;
 	}
 	
@@ -54,24 +59,41 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
         arch.setBooleanIsOpen(true);
         List<TurnArchive> openArch = turnArchiveDao.findList(arch);
         turnSTReqMain.setArchiveId(openArch.get(0).getId());
-        super.save(turnSTReqMain);
-		for (TurnSTReqChild turnSTReqChild : turnSTReqMain.getTurnSTReqChildList()){
-			if (turnSTReqChild.getId() == null){
+		super.save(turnSTReqMain);
+		for (TurnSTReqDepChild turnSTReqDepChild : turnSTReqMain.getTurnSTReqDepChildList()){
+			if (turnSTReqDepChild.getId() == null){
 				continue;
 			}
-			if (TurnSTReqChild.DEL_FLAG_NORMAL.equals(turnSTReqChild.getDelFlag())){
-                String[] idAndNames = turnSTReqChild.getDepartmentName().split("@");
-                turnSTReqChild.setDepartmentId(idAndNames[0]);
-                if (StringUtils.isBlank(turnSTReqChild.getId())){
-					turnSTReqChild.setRequirementId(turnSTReqMain);
-                    turnSTReqChild.preInsert();
-					turnSTReqChildDao.insert(turnSTReqChild);
+			if (TurnSTReqDepChild.DEL_FLAG_NORMAL.equals(turnSTReqDepChild.getDelFlag())){
+                String[] idAndNames = turnSTReqDepChild.getDepartmentName().split("@");
+                turnSTReqDepChild.setDepartmentId(idAndNames[0]);
+                if (StringUtils.isBlank(turnSTReqDepChild.getId())){
+					turnSTReqDepChild.setRequirementId(turnSTReqMain);
+					turnSTReqDepChild.preInsert();
+					turnSTReqDepChildDao.insert(turnSTReqDepChild);
 				}else{
-					turnSTReqChild.preUpdate();
-					turnSTReqChildDao.update(turnSTReqChild);
+					turnSTReqDepChild.preUpdate();
+					turnSTReqDepChildDao.update(turnSTReqDepChild);
 				}
 			}else{
-				turnSTReqChildDao.delete(turnSTReqChild);
+				turnSTReqDepChildDao.delete(turnSTReqDepChild);
+			}
+		}
+		for (TurnSTReqUserChild turnSTReqUserChild : turnSTReqMain.getTurnSTReqUserChildList()){
+			if (turnSTReqUserChild.getId() == null){
+				continue;
+			}
+			if (TurnSTReqUserChild.DEL_FLAG_NORMAL.equals(turnSTReqUserChild.getDelFlag())){
+				if (StringUtils.isBlank(turnSTReqUserChild.getId())){
+					turnSTReqUserChild.setRequirementId(turnSTReqMain);
+					turnSTReqUserChild.preInsert();
+					turnSTReqUserChildDao.insert(turnSTReqUserChild);
+				}else{
+					turnSTReqUserChild.preUpdate();
+					turnSTReqUserChildDao.update(turnSTReqUserChild);
+				}
+			}else{
+				turnSTReqUserChildDao.delete(turnSTReqUserChild);
 			}
 		}
 	}
@@ -79,7 +101,8 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
 	@Transactional(readOnly = false)
 	public void delete(TurnSTReqMain turnSTReqMain) {
 		super.delete(turnSTReqMain);
-		turnSTReqChildDao.delete(new TurnSTReqChild(turnSTReqMain));
+		turnSTReqDepChildDao.delete(new TurnSTReqDepChild(turnSTReqMain));
+		turnSTReqUserChildDao.delete(new TurnSTReqUserChild(turnSTReqMain));
 	}
 	
 }
