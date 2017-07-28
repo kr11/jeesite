@@ -71,13 +71,13 @@
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
-		<%--<div class="control-group">--%>
-			<%--<label class="control-label">所属存档id：</label>--%>
-			<%--<div class="controls">--%>
-				<%--<form:input path="archiveId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>--%>
-				<%--<span class="help-inline"><font color="red">*</font> </span>--%>
-			<%--</div>--%>
-		<%--</div>--%>
+		<div class="control-group">
+			<label class="control-label">所属存档id：</label>
+			<div class="controls">
+				<form:input path="archiveId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
+				<span class="help-inline"><font color="red">*</font> </span>
+			</div>
+		</div>
 		<div class="control-group">
 			<label class="control-label">总时长：</label>
 			<div class="controls">
@@ -119,23 +119,17 @@
 							<tr><td colspan="4"><a href="javascript:" onclick="addRow('#turnSTReqChildList', turnSTReqChildRowIdx, turnSTReqChildTpl);turnSTReqChildRowIdx = turnSTReqChildRowIdx + 1;" class="btn">新增</a></td></tr>
 						</tfoot></shiro:hasPermission>
 					</table>
-					<script type="text/template" id="turnSTReqChildTpl">//
+					<script type="text/template" id="turnSTReqChildTpl">//<!--
 						<tr id="turnSTReqChildList{{idx}}">
 							<td class="hide">
 								<input id="turnSTReqChildList{{idx}}_id" name="turnSTReqChildList[{{idx}}].id" type="hidden" value="{{row.id}}"/>
 								<input id="turnSTReqChildList{{idx}}_delFlag" name="turnSTReqChildList[{{idx}}].delFlag" type="hidden" value="0"/>
 							</td>
 							<td>
-								<%--<form:select path="departmentName" class="input-xlarge">--%>
-									<%--<form:options items="${departmentNameList}" itemLabel="departmentName" itemValue="departmentName" htmlEscape="false"/>--%>
-								<%--</form:select>--%>
 								<select id="turnSTReqChildList{{idx}}_departmentName" name="turnSTReqChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}" class="input-small required">
 									<option value=""></option>
-									<%--<c:forEach items="${fns:getDictList('del_flag')}" var="dict">--%>
-										<%--<option value="${dict.value}">${dict.label}</option>--%>
-									<%--</c:forEach>--%>
-									<c:forEach items="${departmentNameList}" var="dep">
-										<option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
+									<c:forEach items="${fns:getDictList('cms_show_modes')}" var="dict">
+										<option value="${dict.value}">${dict.label}</option>
 									</c:forEach>
 								</select>
 							</td>
@@ -145,7 +139,7 @@
 							<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><td class="text-center" width="10">
 								{{#delBtn}}<span class="close" onclick="delRow(this, '#turnSTReqChildList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
 							</td></shiro:hasPermission>
-						</tr>
+						</tr>//-->
 					</script>
 					<script type="text/javascript">
 						var turnSTReqChildRowIdx = 0, turnSTReqChildTpl = $("#turnSTReqChildTpl").html().replace(/(\/\/\<!\-\-)|(\/\/\-\->)/g,"");

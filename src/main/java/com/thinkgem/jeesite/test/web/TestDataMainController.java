@@ -25,7 +25,7 @@ import com.thinkgem.jeesite.test.service.TestDataMainService;
 /**
  * 主子表生成Controller
  * @author ThinkGem
- * @version 2015-04-06
+ * @version 2017-07-28
  */
 @Controller
 @RequestMapping(value = "${adminPath}/test/testDataMain")

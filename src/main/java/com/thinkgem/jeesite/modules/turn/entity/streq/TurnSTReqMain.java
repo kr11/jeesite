@@ -75,4 +75,8 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 	public void setTurnSTReqChildList(List<TurnSTReqChild> turnSTReqChildList) {
 		this.turnSTReqChildList = turnSTReqChildList;
 	}
+	@Override
+	public String toString() {
+		return id;
+	}
 }

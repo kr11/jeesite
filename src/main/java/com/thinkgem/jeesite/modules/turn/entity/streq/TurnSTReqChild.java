@@ -32,7 +32,7 @@ public class TurnSTReqChild extends DataEntity<TurnSTReqChild> {
 		this.requirementId = requirementId;
 	}
 
-	@Length(min=1, max=64, message="所属标准编号长度必须介于 1 和 64 之间")
+	@Length(min=0, max=64, message="所属标准编号长度必须介于 0 和 64 之间")
 	public TurnSTReqMain getRequirementId() {
 		return requirementId;
 	}

@@ -6,9 +6,7 @@ package com.thinkgem.jeesite.modules.turn.service.streq;
 import java.util.List;
 
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
-import com.thinkgem.jeesite.modules.turn.dao.department.TurnDepartmentDao;
 import com.thinkgem.jeesite.modules.turn.entity.archive.TurnArchive;
-import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,15 +29,12 @@ import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqChildDao;
 public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTReqMain> {
 
 	@Autowired
-    private TurnArchiveDao turnArchiveDao;
-
-	@Autowired
 	private TurnSTReqChildDao turnSTReqChildDao;
 
-    @Autowired
-    private TurnDepartmentDao turnDepartmentDao;
+	@Autowired
+    private TurnArchiveDao turnArchiveDao;
 
-	public TurnSTReqMain get(String id) {
+    public TurnSTReqMain get(String id) {
 		TurnSTReqMain turnSTReqMain = super.get(id);
 		turnSTReqMain.setTurnSTReqChildList(turnSTReqChildDao.findList(new TurnSTReqChild(turnSTReqMain)));
 		return turnSTReqMain;
@@ -59,17 +54,16 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
         arch.setBooleanIsOpen(true);
         List<TurnArchive> openArch = turnArchiveDao.findList(arch);
         turnSTReqMain.setArchiveId(openArch.get(0).getId());
-		super.save(turnSTReqMain);
+        super.save(turnSTReqMain);
 		for (TurnSTReqChild turnSTReqChild : turnSTReqMain.getTurnSTReqChildList()){
 			if (turnSTReqChild.getId() == null){
 				continue;
 			}
 			if (TurnSTReqChild.DEL_FLAG_NORMAL.equals(turnSTReqChild.getDelFlag())){
-			    String[] idAndNames = turnSTReqChild.getDepartmentName().split("@");
-                turnSTReqChild.setDepartmentId(idAndNames[0]);
-                turnSTReqChild.setDepartmentName(idAndNames[1]);
 				if (StringUtils.isBlank(turnSTReqChild.getId())){
 					turnSTReqChild.setRequirementId(turnSTReqMain);
+					//temp
+                    turnSTReqChild.setDepartmentId("50d3281efa7c435dacc41fff474c9d5c");
 					turnSTReqChild.preInsert();
 					turnSTReqChildDao.insert(turnSTReqChild);
 				}else{
@@ -87,10 +81,5 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
 		super.delete(turnSTReqMain);
 		turnSTReqChildDao.delete(new TurnSTReqChild(turnSTReqMain));
 	}
-
-    public List<TurnDepartment> findDepartmentList() {
-        //返回所有科室，其实只要名字，量不大，不要紧
-        return turnDepartmentDao.findAllList(new TurnDepartment());
-    }
 	
 }

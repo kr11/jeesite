@@ -20,7 +20,7 @@ import com.thinkgem.jeesite.test.dao.TestDataChildDao;
 /**
  * 主子表生成Service
  * @author ThinkGem
- * @version 2015-04-06
+ * @version 2017-07-28
  */
 @Service
 @Transactional(readOnly = true)

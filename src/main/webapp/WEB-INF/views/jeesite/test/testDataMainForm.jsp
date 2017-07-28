@@ -139,7 +139,12 @@
 								<input id="testDataChildList{{idx}}_delFlag" name="testDataChildList[{{idx}}].delFlag" type="hidden" value="0"/>
 							</td>
 							<td>
-								<input id="testDataChildList{{idx}}_name" name="testDataChildList[{{idx}}].name" type="text" value="{{row.name}}" maxlength="100" class="input-small "/>
+								<select id="testDataChildList{{idx}}_name" name="testDataChildList[{{idx}}].name" data-value="{{row.name}}" class="input-small ">
+									<option value=""></option>
+									<c:forEach items="${fns:getDictList('cms_show_modes')}" var="dict">
+										<option value="${dict.value}">${dict.label}</option>
+									</c:forEach>
+								</select>
 							</td>
 							<td>
 								<input id="testDataChildList{{idx}}_remarks" name="testDataChildList[{{idx}}].remarks" type="text" value="{{row.remarks}}" maxlength="255" class="input-small "/>

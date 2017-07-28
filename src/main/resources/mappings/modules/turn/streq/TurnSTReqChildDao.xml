@@ -36,7 +36,7 @@
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="requirementId != null and requirementId != ''">
-				AND a.requirement_id = #{requirementId}
+				AND a.requirement_id = #{requirementId.id}
 			</if>
 			<if test="departmentName != null and departmentName != ''">
 				AND a.department_name = #{departmentName}
@@ -85,7 +85,7 @@
 			del_flag
 		) VALUES (
 			#{id},
-			#{requirementId},
+			#{requirementId.id},
 			#{departmentId},
 			#{departmentName},
 			#{timeLength},
@@ -113,7 +113,7 @@
 				WHERE id = #{id}
 			</when>
 			<otherwise>
-				WHERE requirement_id = #{requirementId}
+				WHERE requirement_id = #{requirementId.id}
 			</otherwise>
 		</choose>
 	</update>
