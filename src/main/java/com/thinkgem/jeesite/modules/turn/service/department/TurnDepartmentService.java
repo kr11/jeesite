@@ -64,7 +64,6 @@ public class TurnDepartmentService extends CrudService<TurnDepartmentDao, TurnDe
     }
 
     public List<TurnDepartment> findDepartmentList(TurnDepartment turnDepartment) {
-        //返回所有科室，其实只要名字，量不大，不要紧
         return dao.findAllList(turnDepartment);
     }
 }

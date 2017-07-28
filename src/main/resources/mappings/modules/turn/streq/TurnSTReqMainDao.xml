@@ -100,7 +100,6 @@
 	<update id="update">
 		UPDATE turn_standardized_requirement_main SET 	
 			name = #{name},
-			archive_id = #{archiveId},
 			total_length = #{totalLength},
 			timg_unit = #{timgUnit},
 			update_by = #{updateBy.id},

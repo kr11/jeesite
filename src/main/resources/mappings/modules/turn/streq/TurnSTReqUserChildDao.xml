@@ -5,7 +5,7 @@
 	<sql id="turnSTReqUserChildColumns">
 		a.id AS "id",
 		a.requirement_id AS "requirementId",
-		a.user_id AS "user.id",
+		a.user_id AS "userId",
 		a.user_name AS "userName",
 		a.sex AS "sex",
 		a.user_number AS "userNumber",
@@ -17,8 +17,7 @@
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
 		a.remarks AS "remarks",
-		a.del_flag AS "delFlag",
-		u3.name AS "user.name"
+		a.del_flag AS "delFlag"
 	</sql>
 	
 	<sql id="turnSTReqUserChildJoins">
@@ -111,7 +110,7 @@
 		) VALUES (
 			#{id},
 			#{requirementId.id},
-			#{user.id},
+			#{userId},
 			#{userName},
 			#{sex},
 			#{userNumber},
@@ -129,8 +128,6 @@
 	
 	<update id="update">
 		UPDATE turn_standardized_requirement_user_child SET 	
-			requirement_id = #{requirementId.id},
-			user_id = #{user.id},
 			user_name = #{userName},
 			sex = #{sex},
 			user_number = #{userNumber},

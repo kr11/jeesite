@@ -28,7 +28,6 @@ import java.util.List;
 
 /**
  * 排班-规培标准表Controller
- *
  * @author Carrel
  * @version 2017-07-28
  */
@@ -36,63 +35,61 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/turn/streq/turnSTReqMain")
 public class TurnSTReqMainController extends BaseController {
 
-    @Autowired
-    private TurnSTReqMainService turnSTReqMainService;
+	@Autowired
+	private TurnSTReqMainService turnSTReqMainService;
 
-    @Autowired
-    private TurnDepartmentService turnDepartmentService;
+	@Autowired
+	private TurnDepartmentService turnDepartmentService;
 
-    @ModelAttribute
-    public TurnSTReqMain get(@RequestParam(required = false) String id) {
-        TurnSTReqMain entity = null;
-        if (StringUtils.isNotBlank(id)) {
-            entity = turnSTReqMainService.get(id);
-        }
-        if (entity == null) {
-            entity = new TurnSTReqMain();
-        }
-        return entity;
-    }
 
-    @RequiresPermissions("turn:streq:turnSTReqMain:view")
-    @RequestMapping(value = {"list", ""})
-    public String list(TurnSTReqMain turnSTReqMain, HttpServletRequest request, HttpServletResponse response, Model
-            model) {
-        Page<TurnSTReqMain> page = turnSTReqMainService.findPage(new Page<TurnSTReqMain>(request, response),
-				turnSTReqMain);
-        model.addAttribute("page", page);
-        return "modules/turn/streq/turnSTReqMainList";
-    }
+	@ModelAttribute
+	public TurnSTReqMain get(@RequestParam(required=false) String id) {
+		TurnSTReqMain entity = null;
+		if (StringUtils.isNotBlank(id)){
+			entity = turnSTReqMainService.get(id);
+		}
+		if (entity == null){
+			entity = new TurnSTReqMain();
+		}
+		return entity;
+	}
+	
+	@RequiresPermissions("turn:streq:turnSTReqMain:view")
+	@RequestMapping(value = {"list", ""})
+	public String list(TurnSTReqMain turnSTReqMain, HttpServletRequest request, HttpServletResponse response, Model model) {
+		Page<TurnSTReqMain> page = turnSTReqMainService.findPage(new Page<TurnSTReqMain>(request, response), turnSTReqMain); 
+		model.addAttribute("page", page);
+		return "modules/turn/streq/turnSTReqMainList";
+	}
 
-    @RequiresPermissions("turn:streq:turnSTReqMain:view")
-    @RequestMapping(value = "form")
-    public String form(TurnSTReqMain turnSTReqMain, Model model) {
-        TurnDepartment turnDepartment = new TurnDepartment();
-        turnDepartment.setBooleanIsUsed(true);
-        List<TurnDepartment> depList = turnDepartmentService.findDepartmentList(turnDepartment);
-        model.addAttribute("departmentList", depList);
+	@RequiresPermissions("turn:streq:turnSTReqMain:view")
+	@RequestMapping(value = "form")
+	public String form(TurnSTReqMain turnSTReqMain, Model model) {
+		TurnDepartment turnDepartment = new TurnDepartment();
+		turnDepartment.setBooleanIsUsed(true);
+		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList(turnDepartment);
+		model.addAttribute("departmentList", depList);
+		model.addAttribute("turnSTReqMain", turnSTReqMain);
+		return "modules/turn/streq/turnSTReqMainForm";
+	}
 
-        model.addAttribute("turnSTReqMain", turnSTReqMain);
-        return "modules/turn/streq/turnSTReqMainForm";
-    }
-
-    @RequiresPermissions("turn:streq:turnSTReqMain:edit")
-    @RequestMapping(value = "save")
-    public String save(TurnSTReqMain turnSTReqMain, Model model, RedirectAttributes redirectAttributes) {
-        if (!beanValidator(model, turnSTReqMain)) {
-            return form(turnSTReqMain, model);
-        }
-        turnSTReqMainService.save(turnSTReqMain);
-        addMessage(redirectAttributes, "保存规培标准表成功");
-        return "redirect:" + Global.getAdminPath() + "/turn/streq/turnSTReqMain/?repage";
-    }
-
-    @RequiresPermissions("turn:streq:turnSTReqMain:edit")
-    @RequestMapping(value = "delete")
-    public String delete(TurnSTReqMain turnSTReqMain, RedirectAttributes redirectAttributes) {
-        turnSTReqMainService.delete(turnSTReqMain);
-        addMessage(redirectAttributes, "删除规培标准表成功");
-        return "redirect:" + Global.getAdminPath() + "/turn/streq/turnSTReqMain/?repage";
-    }
+	@RequiresPermissions("turn:streq:turnSTReqMain:edit")
+	@RequestMapping(value = "save")
+	public String save(TurnSTReqMain turnSTReqMain, Model model, RedirectAttributes redirectAttributes) {
+		if (!beanValidator(model, turnSTReqMain)){
+			return form(turnSTReqMain, model);
+		}
+		turnSTReqMainService.save(turnSTReqMain);
+		addMessage(redirectAttributes, "保存规培标准表成功");
+		return "redirect:"+Global.getAdminPath()+"/turn/streq/turnSTReqMain/?repage";
+	}
+	
+	@RequiresPermissions("turn:streq:turnSTReqMain:edit")
+	@RequestMapping(value = "delete")
+	public String delete(TurnSTReqMain turnSTReqMain, RedirectAttributes redirectAttributes) {
+		turnSTReqMainService.delete(turnSTReqMain);
+		addMessage(redirectAttributes, "删除规培标准表成功");
+		return "redirect:"+Global.getAdminPath()+"/turn/streq/turnSTReqMain/?repage";
+	}
 
 }

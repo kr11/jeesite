@@ -71,13 +71,6 @@
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
-		<%--<div class="control-group">--%>
-			<%--<label class="control-label">所属存档id：</label>--%>
-			<%--<div class="controls">--%>
-				<%--<form:input path="archiveId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>--%>
-				<%--<span class="help-inline"><font color="red">*</font> </span>--%>
-			<%--</div>--%>
-		<%--</div>--%>
 		<div class="control-group">
 			<label class="control-label">总时长：</label>
 			<div class="controls">
@@ -110,14 +103,13 @@
 								<th class="hide"></th>
 								<th>科室名</th>
 								<th>时间长度</th>
-								<th>备注信息</th>
 								<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><th width="10">&nbsp;</th></shiro:hasPermission>
 							</tr>
 						</thead>
 						<tbody id="turnSTReqDepChildList">
 						</tbody>
 						<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><tfoot>
-							<tr><td colspan="5"><a href="javascript:" onclick="addRow('#turnSTReqDepChildList', turnSTReqDepChildRowIdx, turnSTReqDepChildTpl);turnSTReqDepChildRowIdx = turnSTReqDepChildRowIdx + 1;" class="btn">新增</a></td></tr>
+							<tr><td colspan="4"><a href="javascript:" onclick="addRow('#turnSTReqDepChildList', turnSTReqDepChildRowIdx, turnSTReqDepChildTpl);turnSTReqDepChildRowIdx = turnSTReqDepChildRowIdx + 1;" class="btn">新增</a></td></tr>
 						</tfoot></shiro:hasPermission>
 					</table>
 					<script type="text/template" id="turnSTReqDepChildTpl">
@@ -129,16 +121,14 @@
 							<td>
 								<select id="turnSTReqDepChildList{{idx}}_departmentName" name="turnSTReqDepChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}" class="input-small required">
 									<option value=""></option>
-									<c:forEach items="${departmentList}" var="dep">
-										<option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
+                                    <c:forEach items="${departmentList}" var="dep">
+                                        <option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
 									</c:forEach>
+
 								</select>
 							</td>
 							<td>
 								<input id="turnSTReqDepChildList{{idx}}_timeLength" name="turnSTReqDepChildList[{{idx}}].timeLength" type="text" value="{{row.timeLength}}" maxlength="64" class="input-small required"/>
-							</td>
-							<td>
-								<textarea id="turnSTReqDepChildList{{idx}}_remarks" name="turnSTReqDepChildList[{{idx}}].remarks" rows="4" maxlength="255" class="input-small ">{{row.remarks}}</textarea>
 							</td>
 							<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><td class="text-center" width="10">
 								{{#delBtn}}<span class="close" onclick="delRow(this, '#turnSTReqDepChildList{{idx}}')" title="删除">&times;</span>{{/delBtn}}
@@ -164,7 +154,6 @@
 						<thead>
 							<tr>
 								<th class="hide"></th>
-								<%--<th>人员系统id</th>--%>
 								<th>姓名</th>
 								<th>性别</th>
 								<th>学员编号</th>
@@ -178,7 +167,7 @@
 						<tbody id="turnSTReqUserChildList">
 						</tbody>
 						<shiro:hasPermission name="turn:streq:turnSTReqMain:edit"><tfoot>
-							<tr><td colspan="10"><a href="javascript:" onclick="addRow('#turnSTReqUserChildList', turnSTReqUserChildRowIdx, turnSTReqUserChildTpl);turnSTReqUserChildRowIdx = turnSTReqUserChildRowIdx + 1;" class="btn">新增</a></td></tr>
+							<tr><td colspan="9"><a href="javascript:" onclick="addRow('#turnSTReqUserChildList', turnSTReqUserChildRowIdx, turnSTReqUserChildTpl);turnSTReqUserChildRowIdx = turnSTReqUserChildRowIdx + 1;" class="btn">新增</a></td></tr>
 						</tfoot></shiro:hasPermission>
 					</table>
 					<script type="text/template" id="turnSTReqUserChildTpl">
@@ -186,10 +175,6 @@
 							<td class="hide">
 								<input id="turnSTReqUserChildList{{idx}}_id" name="turnSTReqUserChildList[{{idx}}].id" type="hidden" value="{{row.id}}"/>
 								<input id="turnSTReqUserChildList{{idx}}_delFlag" name="turnSTReqUserChildList[{{idx}}].delFlag" type="hidden" value="0"/>
-							</td>
-							<td>
-								<sys:treeselect id="turnSTReqUserChildList{{idx}}_user" name="turnSTReqUserChildList[{{idx}}].user.id" value="{{row.user.id}}" labelName="turnSTReqUserChildList{{idx}}.user.name" labelValue="{{row.user.name}}"
-									title="用户" url="/sys/office/treeData?type=3" cssClass="required" allowClear="true" notAllowSelectParent="true"/>
 							</td>
 							<td>
 								<input id="turnSTReqUserChildList{{idx}}_userName" name="turnSTReqUserChildList[{{idx}}].userName" type="text" value="{{row.userName}}" maxlength="64" class="input-small required"/>
