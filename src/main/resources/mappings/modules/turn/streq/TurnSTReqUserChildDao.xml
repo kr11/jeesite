@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao">
+    
+	<sql id="turnSTReqUserChildColumns">
+		a.id AS "id",
+		a.requirement_id AS "requirementId",
+		a.user_id AS "user.id",
+		a.user_name AS "userName",
+		a.sex AS "sex",
+		a.user_number AS "userNumber",
+		a.grade AS "grade",
+		a.class AS "userClass",
+		a.group_id AS "groupId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u3.name AS "user.name"
+	</sql>
+	
+	<sql id="turnSTReqUserChildJoins">
+		LEFT JOIN turn_standardized_requirement_main b ON b.id = a.requirement_id
+		LEFT JOIN sys_user u3 ON u3.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="TurnSTReqUserChild">
+		SELECT 
+			<include refid="turnSTReqUserChildColumns"/>
+		FROM turn_standardized_requirement_user_child a
+		<include refid="turnSTReqUserChildJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TurnSTReqUserChild">
+		SELECT 
+			<include refid="turnSTReqUserChildColumns"/>
+		FROM turn_standardized_requirement_user_child a
+		<include refid="turnSTReqUserChildJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="requirementId != null and requirementId != ''">
+				AND a.requirement_id = #{requirementId.id}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="userNumber != null and userNumber != ''">
+				AND a.user_number = #{userNumber}
+			</if>
+			<if test="grade != null and grade != ''">
+				AND a.grade = #{grade}
+			</if>
+			<if test="userClass != null and userClass != ''">
+				AND a.class = #{userClass}
+			</if>
+			<if test="groupId != null and groupId != ''">
+				AND a.group_id = #{groupId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TurnSTReqUserChild">
+		SELECT 
+			<include refid="turnSTReqUserChildColumns"/>
+		FROM turn_standardized_requirement_user_child a
+		<include refid="turnSTReqUserChildJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO turn_standardized_requirement_user_child(
+			id,
+			requirement_id,
+			user_id,
+			user_name,
+			sex,
+			user_number,
+			grade,
+			class,
+			group_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{requirementId.id},
+			#{user.id},
+			#{userName},
+			#{sex},
+			#{userNumber},
+			#{grade},
+			#{userClass},
+			#{groupId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE turn_standardized_requirement_user_child SET 	
+			requirement_id = #{requirementId.id},
+			user_id = #{user.id},
+			user_name = #{userName},
+			sex = #{sex},
+			user_number = #{userNumber},
+			grade = #{grade},
+			class = #{userClass},
+			group_id = #{groupId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE turn_standardized_requirement_user_child SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		<choose>
+			<when test="id !=null and id != ''">
+				WHERE id = #{id}
+			</when>
+			<otherwise>
+				WHERE requirement_id = #{requirementId.id}
+			</otherwise>
+		</choose>
+	</update>
+	
+</mapper>
