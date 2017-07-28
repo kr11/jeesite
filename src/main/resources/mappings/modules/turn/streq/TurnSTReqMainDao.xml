@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao">
+    
+	<sql id="turnSTReqMainColumns">
+		a.id AS "id",
+		a.name AS "name",
+		a.archive_id AS "archiveId",
+		a.total_length AS "totalLength",
+		a.create_by AS "createBy.id",
+		a.timg_unit AS "timgUnit",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="turnSTReqMainJoins">
+	</sql>
+    
+	<select id="get" resultType="TurnSTReqMain">
+		SELECT 
+			<include refid="turnSTReqMainColumns"/>
+		FROM turn_standardized_requirement_main a
+		<include refid="turnSTReqMainJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="TurnSTReqMain">
+		SELECT 
+			<include refid="turnSTReqMainColumns"/>
+		FROM turn_standardized_requirement_main a
+		<include refid="turnSTReqMainJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name = #{name}
+			</if>
+			<if test="totalLength != null and totalLength != ''">
+				AND a.total_length = #{totalLength}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="TurnSTReqMain">
+		SELECT 
+			<include refid="turnSTReqMainColumns"/>
+		FROM turn_standardized_requirement_main a
+		<include refid="turnSTReqMainJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO turn_standardized_requirement_main(
+			id,
+			name,
+			archive_id,
+			total_length,
+			create_by,
+			timg_unit,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{name},
+			#{archiveId},
+			#{totalLength},
+			#{createBy.id},
+			#{timgUnit},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE turn_standardized_requirement_main SET 	
+			name = #{name},
+			archive_id = #{archiveId},
+			total_length = #{totalLength},
+			timg_unit = #{timgUnit},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE turn_standardized_requirement_main SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
