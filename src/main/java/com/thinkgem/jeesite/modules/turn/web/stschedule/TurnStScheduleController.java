@@ -26,6 +26,7 @@ import java.util.List;
 
 /**
  * 排班-规培调度表Controller
+ *
  * @author Carrel
  * @version 2017-07-29
  */
@@ -33,54 +34,62 @@ import java.util.List;
 @RequestMapping(value = "${adminPath}/turn/stschedule/turnStSchedule")
 public class TurnStScheduleController extends BaseController {
 
-	@Autowired
-	private TurnStScheduleService turnStScheduleService;
-	
-	@ModelAttribute
-	public TurnStSchedule get(@RequestParam(required=false) String id) {
-		TurnStSchedule entity = null;
-		if (StringUtils.isNotBlank(id)){
-			entity = turnStScheduleService.get(id);
-		}
-		if (entity == null){
-			entity = new TurnStSchedule();
-		}
-		return entity;
-	}
-	
-	@RequiresPermissions("turn:stschedule:turnStSchedule:view")
-	@RequestMapping(value = {"list", ""})
-	public String list(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model model) {
-//		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response), turnStSchedule);
-		List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
-		model.addAttribute("diffList", diffList);
-		return "modules/turn/stschedule/turnStScheduleList";
-	}
+    @Autowired
+    private TurnStScheduleService turnStScheduleService;
 
-	@RequiresPermissions("turn:stschedule:turnStSchedule:view")
-	@RequestMapping(value = "form")
-	public String form(TurnStSchedule turnStSchedule, Model model) {
-		model.addAttribute("turnStSchedule", turnStSchedule);
-		return "modules/turn/stschedule/turnStScheduleForm";
-	}
+    @ModelAttribute
+    public TurnStSchedule get(@RequestParam(required = false) String id) {
+        TurnStSchedule entity = null;
+        if (StringUtils.isNotBlank(id)) {
+            entity = turnStScheduleService.get(id);
+        }
+        if (entity == null) {
+            entity = new TurnStSchedule();
+        }
+        return entity;
+    }
 
-	@RequiresPermissions("turn:stschedule:turnStSchedule:edit")
-	@RequestMapping(value = "save")
-	public String save(TurnStSchedule turnStSchedule, Model model, RedirectAttributes redirectAttributes) {
-		if (!beanValidator(model, turnStSchedule)){
-			return form(turnStSchedule, model);
-		}
-		turnStScheduleService.save(turnStSchedule);
-		addMessage(redirectAttributes, "保存排班-规培调度表成功");
-		return "redirect:"+Global.getAdminPath()+"/turn/stschedule/turnStSchedule/?repage";
-	}
-	
-	@RequiresPermissions("turn:stschedule:turnStSchedule:edit")
-	@RequestMapping(value = "delete")
-	public String delete(TurnStSchedule turnStSchedule, RedirectAttributes redirectAttributes) {
-		turnStScheduleService.delete(turnStSchedule);
-		addMessage(redirectAttributes, "删除排班-规培调度表成功");
-		return "redirect:"+Global.getAdminPath()+"/turn/stschedule/turnStSchedule/?repage";
-	}
+    @RequiresPermissions("turn:stschedule:turnStSchedule:view")
+    @RequestMapping(value = {"list", ""})
+    public String list(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model
+            model) {
+//		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response),
+// turnStSchedule);
+        List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
+        model.addAttribute("diffList", diffList);
+        return "modules/turn/stschedule/turnStScheduleList";
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:view")
+    @RequestMapping(value = "form")
+    public String form(TurnStSchedule turnStSchedule, Model model) {
+        model.addAttribute("turnStSchedule", turnStSchedule);
+        return "modules/turn/stschedule/turnStScheduleForm";
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
+    @RequestMapping(value = "save")
+    public String save(TurnStSchedule turnStSchedule, Model model, RedirectAttributes redirectAttributes) {
+        //在验证最终写入的数据之前，先转化起止时间，然后验证，然后save的时候去更改自己人的其他东西
+        String ret = turnStScheduleService.convertStartAndEndTime(model, turnStSchedule);
+        if(ret != null){
+            addMessage(model, ret);
+            return form(turnStSchedule, model);
+        }
+        if (!beanValidator(model, turnStSchedule)) {
+            return form(turnStSchedule, model);
+        }
+        turnStScheduleService.save(turnStSchedule);
+        addMessage(redirectAttributes, "保存排班-规培调度表成功");
+        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
+    @RequestMapping(value = "delete")
+    public String delete(TurnStSchedule turnStSchedule, RedirectAttributes redirectAttributes) {
+        turnStScheduleService.delete(turnStSchedule);
+        addMessage(redirectAttributes, "删除排班-规培调度表成功");
+        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+    }
 
 }

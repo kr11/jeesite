@@ -20,11 +20,14 @@ import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.thinkgem.jeesite.modules.turn.ReqTimeUnit.addZeroAtHeadForInt;
 
 /**
  * 排班-规培调度表Service
@@ -63,7 +66,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     @Transactional(readOnly = false)
     public void save(TurnStSchedule turnStSchedule) {
         turnStSchedule.setArchiveId(getArchiveId());
-        //转变
+        //除了id，其他的都已经有了，唯一可以编辑的就是start和end，这里处理一下
+        //更新的同时，把自己的其他部分找出来，然后覆盖掉
         super.save(turnStSchedule);
     }
 
@@ -138,7 +142,6 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         List<TurnStSchedule> diffRet = new ArrayList<>();
         //这一年的所有标准
         for (TurnSTReqMain turnSTReqMain : stReqList) {
-            String startYAtM = turnSTReqMain.getStartYAtM();
             String timeUnit = turnSTReqMain.getTimgUnit();
             //每一个标准的所有人和科室
             List<TurnSTReqUserChild> reqUserList = getReqUserList(turnSTReqMain.getId());
@@ -146,17 +149,17 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             for (TurnSTReqUserChild user : reqUserList) {
                 String userId = user.getId();
                 for (TurnSTReqDepChild dep : reqDepList) {
-                    String oughtLength = dep.getTimeLength() + " 个 "+ReqTimeUnit.getName(timeUnit);
+                    String oughtLength = dep.getTimeLength() + " 个 " + ReqTimeUnit.getName(timeUnit);
                     if (!scheMap.containsKey(userId) || scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
-                        diffRet.add(diffRequirement(user, dep, null, oughtLength, timeUnit, startYAtM));
+                        diffRet.add(diffRequirement(turnSTReqMain, user, dep, null, oughtLength));
                     } else {
                         //包含要求的科室，则判断长短
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
                         int actualLen = userDepSche.getEndIntInt() - userDepSche.getStartIntInt();
                         if (ReqTimeUnit.getConvertedTimeLengthInt(dep.getTimeLength(), timeUnit) != actualLen) {
                             //长度不同，标记
-                            diffRet.add(diffRequirement(user, dep, userDepSche, oughtLength, timeUnit, startYAtM));
+                            diffRet.add(diffRequirement(turnSTReqMain, user, dep, userDepSche, oughtLength));
                         }
                     }
                 }
@@ -166,32 +169,66 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     }
 
     private TurnStSchedule diffRequirement(
+            TurnSTReqMain turnSTReqMain,
             TurnSTReqUserChild turnSTReqUserChild,
-            TurnSTReqDepChild turnSTReqDepChild, TurnStSchedule userDepSche, String oughtLength,
-            String timeUnit, String startYatM) {
+            TurnSTReqDepChild turnSTReqDepChild, TurnStSchedule userDepSche,
+            String oughtLength) {
         TurnStSchedule ret = (userDepSche == null) ?
                 new TurnStSchedule() : new TurnStSchedule(userDepSche.getId());
+        ret.setArchiveId(turnSTReqMain.getArchiveId());
+        ret.setDepId(turnSTReqDepChild.getDepartmentId());
         ret.setDepName(turnSTReqDepChild.getDepartmentName().split("@")[1]);
+        ret.setUser(turnSTReqUserChild.getId());
         ret.setUserName(turnSTReqUserChild.getUserName());
-        ret.setOughtTimeLength(oughtLength);
+        ret.setRequirementId(turnSTReqMain.getId());
         if (userDepSche != null) {
-            ret.setStartYandM(ReqTimeUnit.addYearAtMonth(timeUnit, startYatM, userDepSche.getStartIntInt()));
-            ret.setEndInt(ReqTimeUnit.addYearAtMonth(timeUnit, startYatM, userDepSche.getEndIntInt()));
+            ret.setStartInt(userDepSche.getStartInt());
+            ret.setEndInt(userDepSche.getEndInt());
+        } else {
+            ret.setStartInt("");
+            ret.setEndInt("");
         }
-        else{
+        ret.setOughtTimeLength(oughtLength);
+        String startYAtM = turnSTReqMain.getStartYAtM();
+        String timeUnit = turnSTReqMain.getTimgUnit();
+        ret.setReqStartYAndM(startYAtM);
+
+        ret.setTimeUnit(timeUnit);
+        if (userDepSche != null) {
+            ReqTimeUnit.addYearAtMonth(true, ret, timeUnit, startYAtM, userDepSche.getStartIntInt());
+            ReqTimeUnit.addYearAtMonth(false, ret, timeUnit, startYAtM, userDepSche.getEndIntInt());
+        } else {
             ret.setStartYandM("未设置");
             ret.setEndYandM("未设置");
         }
         return ret;
     }
 
-    private String getArchiveId(){
-        if(TurnConstant.currentArchive == null){
+    private String getArchiveId() {
+        if (TurnConstant.currentArchive == null) {
             TurnArchive arch = new TurnArchive();
             arch.setBooleanIsOpen(true);
             List<TurnArchive> openArch = turnArchiveDao.findList(arch);
             TurnConstant.currentArchive = openArch.get(0).getId();
         }
         return TurnConstant.currentArchive;
+    }
+
+
+    public String convertStartAndEndTime(Model model, TurnStSchedule turnStSchedule) {
+        if (!ReqTimeUnit.checkYearAtMonth(turnStSchedule.getStartYandM()) ||
+                !ReqTimeUnit.checkYearAtMonth(turnStSchedule.getStartYandM())) {
+            return "开始/结束时间输入不合法";
+        }
+        int startInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
+                turnStSchedule.getReqStartYAndM(), turnStSchedule.getStartYandM(),
+                turnStSchedule.getTimeUnit(), turnStSchedule.getStartMonthUpOrDown());
+
+            turnStSchedule.setStartInt(Integer.valueOf(startInt).toString());
+        int endInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
+                turnStSchedule.getReqStartYAndM(), turnStSchedule.getEndYandM(),
+                turnStSchedule.getTimeUnit(), turnStSchedule.getEndMonthUpOrDown());
+        turnStSchedule.setEndInt(Integer.valueOf(endInt).toString());
+        return null;
     }
 }

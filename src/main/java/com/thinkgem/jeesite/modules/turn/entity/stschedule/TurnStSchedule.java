@@ -3,6 +3,7 @@
  */
 package com.thinkgem.jeesite.modules.turn.entity.stschedule;
 
+import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import org.hibernate.validator.constraints.Length;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
@@ -23,9 +24,42 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
 	private String depName;		// 科室名
 	private String startInt;		// 开始时间半月整数
 	private String endInt;		// 结束时间半月整数
+
     private String startYandM;  //开始年月，字符串形式:Y-M，Y-M-上，以及某个周一的年月日
     private String endYandM;  //开始年月，字符串形式:Y-M，Y-M-上，以及某个周一的年月日
     private String oughtTimeLength; //应该时长：X个半月/X个月/X个五周
+    private String reqStartYAndM; //该调度所属的标准的开始时间
+    private String reqEndYAndM; //该调度所属的标准的结束时间
+
+
+    private String startMonthUpOrDown;
+
+    public String getStartMonthUpOrDown() {
+        return startMonthUpOrDown;
+    }
+
+    public void setStartMonthUpOrDown(String startMonthUpOrDown) {
+        this.startMonthUpOrDown = startMonthUpOrDown;
+    }
+
+    public String getEndMonthUpOrDown() {
+        return endMonthUpOrDown;
+    }
+
+    public void setEndMonthUpOrDown(String endMonthUpOrDown) {
+        this.endMonthUpOrDown = endMonthUpOrDown;
+    }
+
+    private String endMonthUpOrDown;
+    public String getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(String timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+
+    private String timeUnit;
 
 	public TurnStSchedule() {
 		super();
@@ -137,5 +171,21 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
 
     public void setOughtTimeLength(String oughtTimeLength) {
         this.oughtTimeLength = oughtTimeLength;
+    }
+
+    public String getReqStartYAndM() {
+        return reqStartYAndM;
+    }
+
+    public void setReqStartYAndM(String reqStartYAndM) {
+        this.reqStartYAndM = reqStartYAndM;
+    }
+
+    public String getReqEndYAndM() {
+        return reqEndYAndM;
+    }
+
+    public void setReqEndYAndM(String reqEndYAndM) {
+        this.reqEndYAndM = reqEndYAndM;
     }
 }

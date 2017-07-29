@@ -16,7 +16,7 @@ public class TurnSTReqUserChild extends DataEntity<TurnSTReqUserChild> {
 	
 	private static final long serialVersionUID = 1L;
 	private TurnSTReqMain requirementId;		// 所属标准编号 父类
-	private String userId;		// 人员系统id
+	private String userId;		// 人员系统id(可空，参照别的，这里的人的编号就是id)
 	private String userName;		// 姓名
 	private String sex;		// 性别
 	private String userNumber;		// 学员编号
