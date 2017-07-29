@@ -76,18 +76,6 @@
                 <form:form id="searchForm${turnStSchedule.userName}${turnStSchedule.depName}"
                            modelAttribute="turnStSchedule"
                            action="${ctx}/turn/stschedule/turnStSchedule/form" style="display:none" method="post">
-                    <form:hidden path="id"/>
-                    <form:hidden path="archiveId"/>
-                    <form:hidden path="depId"/>
-                    <form:hidden path="depName"/>
-                    <form:hidden path="user"/>
-                    <form:hidden path="userName"/>
-                    <form:hidden path="requirementId"/>
-                    <form:hidden path="startInt"/>
-                    <form:hidden path="endInt"/>
-                    <form:hidden path="timeUnit"/>
-                    <form:hidden path="reqStartYAndM"/>
-
                     <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
                     <input id="archiveId" name="archiveId" type="hidden" value="${turnStSchedule.archiveId}"/>
                     <input id="depId" name="depId" type="hidden" value="${turnStSchedule.depId}"/>
@@ -100,6 +88,7 @@
                     <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
                     <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
                     <input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>
+                    <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
                     <input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"
                            value="${turnStSchedule.startMonthUpOrDown}"/>
                     <input id="endMonthUpOrDown" name="endMonthUpOrDown" type="hidden"

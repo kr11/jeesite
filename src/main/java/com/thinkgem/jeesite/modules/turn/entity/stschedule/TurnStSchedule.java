@@ -31,7 +31,9 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     private String reqStartYAndM; //该调度所属的标准的开始时间
     private String reqEndYAndM; //该调度所属的标准的结束时间
 
-
+    public String getId(){
+        return id;
+    }
     private String startMonthUpOrDown;
 
     public String getStartMonthUpOrDown() {

@@ -190,8 +190,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         }
         ret.setOughtTimeLength(oughtLength);
         String startYAtM = turnSTReqMain.getStartYAtM();
+        String endYAtM = turnSTReqMain.getEndYAtM();
         String timeUnit = turnSTReqMain.getTimgUnit();
         ret.setReqStartYAndM(startYAtM);
+        ret.setReqEndYAndM(endYAtM);
 
         ret.setTimeUnit(timeUnit);
         if (userDepSche != null) {
@@ -216,18 +218,31 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
 
 
     public String convertStartAndEndTime(Model model, TurnStSchedule turnStSchedule) {
-        if (!ReqTimeUnit.checkYearAtMonth(turnStSchedule.getStartYandM()) ||
-                !ReqTimeUnit.checkYearAtMonth(turnStSchedule.getStartYandM())) {
+        String reqStart = turnStSchedule.getReqStartYAndM();
+        String reqEnd = turnStSchedule.getReqEndYAndM();
+        String thisStart = turnStSchedule.getStartYandM();
+        String thisEnd = turnStSchedule.getEndYandM();
+        if (reqStart.compareTo(thisStart) > 0 ||
+                reqStart.compareTo(thisEnd) > 0)
+            return "本调度的开始/结束时间 早于 标准的开始时间：" + reqStart;
+        if (reqEnd.compareTo(thisStart) < 0 ||
+                reqEnd.compareTo(thisEnd) < 0)
+            return "本调度的开始/结束时间 晚于 标准的结束时间：" + reqEnd;
+
+        if (!ReqTimeUnit.checkYearAtMonth(thisStart) ||
+                !ReqTimeUnit.checkYearAtMonth(thisStart)) {
             return "开始/结束时间输入不合法";
         }
-        int startInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
-                turnStSchedule.getReqStartYAndM(), turnStSchedule.getStartYandM(),
-                turnStSchedule.getTimeUnit(), turnStSchedule.getStartMonthUpOrDown());
 
-            turnStSchedule.setStartInt(Integer.valueOf(startInt).toString());
+        int startInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
+                turnStSchedule.getReqStartYAndM(), thisStart,
+                turnStSchedule.getTimeUnit(), turnStSchedule.getStartMonthUpOrDown());
         int endInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
-                turnStSchedule.getReqStartYAndM(), turnStSchedule.getEndYandM(),
+                turnStSchedule.getReqStartYAndM(), thisEnd,
                 turnStSchedule.getTimeUnit(), turnStSchedule.getEndMonthUpOrDown());
+        if (endInt < startInt)
+            return "本调度的开始时间晚于结束时间";
+        turnStSchedule.setStartInt(Integer.valueOf(startInt).toString());
         turnStSchedule.setEndInt(Integer.valueOf(endInt).toString());
         return null;
     }

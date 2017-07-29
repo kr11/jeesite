@@ -49,6 +49,7 @@
         <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
         <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
         <input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>
+        <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
         <label class="control-label">用户名：</label>
         <div class="controls">
             <span>${turnStSchedule.userName}</span>
