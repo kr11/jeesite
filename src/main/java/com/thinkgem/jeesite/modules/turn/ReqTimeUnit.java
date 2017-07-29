@@ -40,25 +40,21 @@ public enum ReqTimeUnit {
             return false;
         }
     }
-    public static void addYearAtMonth(boolean isStart, TurnStSchedule ret, String timeUnit, String year_month, int offset) {
-        String[] ym = year_month.split("-");
-        int addedY = Integer.valueOf(ym[0]);
-        int addedM = Integer.valueOf(ym[1]);
+
+    public static void addYearAtMonth(boolean isStart, TurnStSchedule ret, String timeUnit, String year_month, int
+            offset) {
+        int t = convertYYYY_MM_2Int(year_month, timeUnit) + offset;
         String retString;
         switch (ReqTimeUnit.valueOf(timeUnit)) {
             case halfmonth:
-                int t = addedY * 24 + addedM * 2 + offset;
-                retString = addZeroAtHeadForInt(t / 24, 4)
-                        + '-' + addZeroAtHeadForInt((t % 24) / 2, 2);
+                retString = convertInt_2_YYYY_MM(t, timeUnit);
                 if (isStart)
-                    ret.setStartMonthUpOrDown((((t & 1) == 1) ? "上半月" : "下半月"));
+                    ret.setStartMonthUpOrDown((((t & 1) == 1) ? "下半月" : "上半月"));
                 else
-                    ret.setEndMonthUpOrDown((((t & 1) == 1) ? "上半月" : "下半月"));
+                    ret.setEndMonthUpOrDown((((t & 1) == 1) ? "下半月" : "上半月"));
                 break;
             case onemonth:
-                t = addedY * 12 + addedM + offset;
-                retString = addZeroAtHeadForInt(t / 12, 4)
-                        + '-' + addZeroAtHeadForInt((t % 12), 2);
+                retString = convertInt_2_YYYY_MM(t, timeUnit);
                 ret.setStartMonthUpOrDown(null);
                 ret.setEndMonthUpOrDown(null);
                 break;
@@ -71,6 +67,7 @@ public enum ReqTimeUnit {
         else
             ret.setEndYandM(retString);
     }
+
 
     public static String addZeroAtHeadForInt(int number, int length) {
         String n = Integer.valueOf(number).toString();
@@ -87,7 +84,18 @@ public enum ReqTimeUnit {
         String[] ym = startTime.split("-");
         int srcY = Integer.valueOf(ym[0]);
         int srcM = Integer.valueOf(ym[1]);
-        return isHalfMonth(timeUnit) ? (srcY * 12 + srcM) * 2 : (srcY * 12 + srcM);
+        assert srcM >= 1 && srcM <= 12;
+        return isHalfMonth(timeUnit) ? (srcY * 12 + srcM - 1) * 2 : (srcY * 12 + srcM - 1);
+    }
+
+
+    private static String convertInt_2_YYYY_MM(int t, String timeUnit) {
+        if (isHalfMonth(timeUnit))
+            t /= 2;
+        int y = t / 12;
+        int m = t % 12;
+        return addZeroAtHeadForInt(y, 4)
+                + '-' + addZeroAtHeadForInt(m + 1, 2);
     }
 
     public static int calculate_Diff_YandM_2_Int(String startTime, String offsetTime,

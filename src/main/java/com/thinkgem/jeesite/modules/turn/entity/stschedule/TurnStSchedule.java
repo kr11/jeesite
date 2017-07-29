@@ -10,31 +10,54 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * 排班-规培调度表Entity
+ *
  * @author Carrel
  * @version 2017-07-29
  */
 public class TurnStSchedule extends DataEntity<TurnStSchedule> {
-	
-	private static final long serialVersionUID = 1L;
-	private String archiveId;		// 所属存档id
-	private String user;		// 用户id
-	private String userName;		// 用户名
-	private String requirementId;		// 所属标准id
-	private String depId;		// 科室id
-	private String depName;		// 科室名
-	private String startInt;		// 开始时间半月整数
-	private String endInt;		// 结束时间半月整数
+
+    private static final long serialVersionUID = 1L;
+    private String archiveId;        // 所属存档id
+    private String user;        // 用户id
+    private String userName;        // 用户名
+    private String requirementId;        // 所属标准id
+    private String depId;        // 科室id
+    private String depName;        // 科室名
+    private String startInt;        // 开始时间半月整数
+    private String endInt;        // 结束时间半月整数
 
     private String startYandM;  //开始年月，字符串形式:Y-M，Y-M-上，以及某个周一的年月日
     private String endYandM;  //开始年月，字符串形式:Y-M，Y-M-上，以及某个周一的年月日
     private String oughtTimeLength; //应该时长：X个半月/X个月/X个五周
     private String reqStartYAndM; //该调度所属的标准的开始时间
     private String reqEndYAndM; //该调度所属的标准的结束时间
+    private String startMonthUpOrDown;
+    private String endMonthUpOrDown;
+    private String timeUnit;
 
-    public String getId(){
+    public TurnStSchedule(TurnStSchedule turnStSchedule) {
+        super(turnStSchedule.getId());
+        this.archiveId = turnStSchedule.archiveId;
+        this.user = turnStSchedule.user;
+        this.userName = turnStSchedule.userName;
+        this.requirementId = turnStSchedule.requirementId;
+        this.depId = turnStSchedule.depId;
+        this.depName = turnStSchedule.depName;
+        this.startInt = turnStSchedule.startInt;
+        this.endInt = turnStSchedule.endInt;
+        this.startYandM = turnStSchedule.startYandM;
+        this.endYandM = turnStSchedule.endYandM;
+        this.oughtTimeLength = turnStSchedule.oughtTimeLength;
+        this.reqStartYAndM = turnStSchedule.reqStartYAndM;
+        this.reqEndYAndM = turnStSchedule.reqEndYAndM;
+        this.startMonthUpOrDown = turnStSchedule.startMonthUpOrDown;
+        this.endMonthUpOrDown = turnStSchedule.endMonthUpOrDown;
+        this.timeUnit = turnStSchedule.timeUnit;
+    }
+
+    public String getId() {
         return id;
     }
-    private String startMonthUpOrDown;
 
     public String getStartMonthUpOrDown() {
         return startMonthUpOrDown;
@@ -52,7 +75,6 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
         this.endMonthUpOrDown = endMonthUpOrDown;
     }
 
-    private String endMonthUpOrDown;
     public String getTimeUnit() {
         return timeUnit;
     }
@@ -61,74 +83,72 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
         this.timeUnit = timeUnit;
     }
 
-    private String timeUnit;
+    public TurnStSchedule() {
+        super();
+    }
 
-	public TurnStSchedule() {
-		super();
-	}
+    public TurnStSchedule(String id) {
+        super(id);
+    }
 
-	public TurnStSchedule(String id){
-		super(id);
-	}
+    @Length(min = 1, max = 64, message = "所属存档id长度必须介于 1 和 64 之间")
+    public String getArchiveId() {
+        return archiveId;
+    }
 
-	@Length(min=1, max=64, message="所属存档id长度必须介于 1 和 64 之间")
-	public String getArchiveId() {
-		return archiveId;
-	}
+    public void setArchiveId(String archiveId) {
+        this.archiveId = archiveId;
+    }
 
-	public void setArchiveId(String archiveId) {
-		this.archiveId = archiveId;
-	}
-	
-	@Length(min=1, max=64, message="用户id长度必须介于 1 和 64 之间")
-	public String getUser() {
-		return user;
-	}
+    @Length(min = 1, max = 64, message = "用户id长度必须介于 1 和 64 之间")
+    public String getUser() {
+        return user;
+    }
 
-	public void setUser(String user) {
-		this.user = user;
-	}
-	
-	@Length(min=1, max=64, message="用户名长度必须介于 1 和 64 之间")
-	public String getUserName() {
-		return userName;
-	}
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	
-	@Length(min=1, max=64, message="所属标准id长度必须介于 1 和 64 之间")
-	public String getRequirementId() {
-		return requirementId;
-	}
+    @Length(min = 1, max = 64, message = "用户名长度必须介于 1 和 64 之间")
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setRequirementId(String requirementId) {
-		this.requirementId = requirementId;
-	}
-	
-	@Length(min=1, max=64, message="科室id长度必须介于 1 和 64 之间")
-	public String getDepId() {
-		return depId;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public void setDepId(String depId) {
-		this.depId = depId;
-	}
-	
-	@Length(min=1, max=64, message="科室名长度必须介于 1 和 64 之间")
-	public String getDepName() {
-		return depName;
-	}
+    @Length(min = 1, max = 64, message = "所属标准id长度必须介于 1 和 64 之间")
+    public String getRequirementId() {
+        return requirementId;
+    }
 
-	public void setDepName(String depName) {
-		this.depName = depName;
-	}
-	
-	@Length(min=1, max=64, message="开始时间半月整数长度必须介于 1 和 64 之间")
-	public String getStartInt() {
-		return startInt;
-	}
+    public void setRequirementId(String requirementId) {
+        this.requirementId = requirementId;
+    }
+
+    @Length(min = 1, max = 64, message = "科室id长度必须介于 1 和 64 之间")
+    public String getDepId() {
+        return depId;
+    }
+
+    public void setDepId(String depId) {
+        this.depId = depId;
+    }
+
+    @Length(min = 1, max = 64, message = "科室名长度必须介于 1 和 64 之间")
+    public String getDepName() {
+        return depName;
+    }
+
+    public void setDepName(String depName) {
+        this.depName = depName;
+    }
+
+    @Length(min = 1, max = 64, message = "开始时间半月整数长度必须介于 1 和 64 之间")
+    public String getStartInt() {
+        return startInt;
+    }
 
     public int getStartIntInt() {
         return Integer.valueOf(startInt);
@@ -138,18 +158,26 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
         return Integer.valueOf(endInt);
     }
 
-	public void setStartInt(String startInt) {
-		this.startInt = startInt;
-	}
-	
-	@Length(min=1, max=64, message="结束时间半月整数长度必须介于 1 和 64 之间")
-	public String getEndInt() {
-		return endInt;
-	}
+    public void setStartInt(String startInt) {
+        this.startInt = startInt;
+    }
 
-	public void setEndInt(String endInt) {
-		this.endInt = endInt;
-	}
+    public void setStartInt(int startInt) {
+        this.startInt = Integer.valueOf(startInt).toString();
+    }
+
+    @Length(min = 1, max = 64, message = "结束时间半月整数长度必须介于 1 和 64 之间")
+    public String getEndInt() {
+        return endInt;
+    }
+
+    public void setEndInt(String endInt) {
+        this.endInt = endInt;
+    }
+
+    public void setEndInt(int endInt) {
+        this.endInt = Integer.valueOf(endInt).toString();
+    }
 
     public String getStartYandM() {
         return startYandM;
@@ -190,4 +218,13 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     public void setReqEndYAndM(String reqEndYAndM) {
         this.reqEndYAndM = reqEndYAndM;
     }
+
+//    /**
+//     * 选出这样的对象，param时间段完全包含了他们
+//     * @param paramStart
+//     * @param paramEnd
+//     */
+//    public selectParamFullCoverItems(String paramStart, String paramEnd){
+//
+//    }
 }

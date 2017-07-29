@@ -38,6 +38,8 @@ import static com.thinkgem.jeesite.modules.turn.ReqTimeUnit.addZeroAtHeadForInt;
 @Service
 @Transactional(readOnly = true)
 public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnStSchedule> {
+//    @Autowired
+//    private TurnStScheduleDao turnStScheduleDao;
 
     @Autowired
     private TurnSTReqDepChildDao depChildDao;
@@ -68,6 +70,54 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         turnStSchedule.setArchiveId(getArchiveId());
         //除了id，其他的都已经有了，唯一可以编辑的就是start和end，这里处理一下
         //更新的同时，把自己的其他部分找出来，然后覆盖掉
+        coverSelfOtherSche(turnStSchedule);
+    }
+
+    /**
+     * 基于当前的修改，找出该用户其他的调度，并覆盖掉冲突调度
+     * 左右区间是左闭右开，即：8月~9月，长度为8月这1个月。
+     *
+     * @param turnStSchedule
+     */
+    private void coverSelfOtherSche(TurnStSchedule turnStSchedule) {
+        TurnStSchedule query = new TurnStSchedule();
+        query.setArchiveId(turnStSchedule.getArchiveId());
+        query.setUser(turnStSchedule.getUser());
+        List<TurnStSchedule> userList = super.findList(query);
+        for (TurnStSchedule other : userList) {
+            //不同的部分只能以科室区分，自己不算，管其他人
+            if (!other.getDepId().equals(turnStSchedule.getDepId())) {
+                //判断两个左闭右开区间的重叠
+                int oStart = other.getStartIntInt();
+                int oEnd = other.getEndIntInt();
+                int tStart = turnStSchedule.getStartIntInt();
+                int tEnd = turnStSchedule.getEndIntInt();
+                //不相邻，不处理
+                if (oStart >= tEnd || tStart >= oEnd) {
+                } else if (tStart <= oStart && tEnd >= oEnd) {
+                    //完全覆盖，删除other
+                    delete(other);
+                } else if (tStart > oStart && tEnd < oEnd) {
+                    //被截断成两个，更新一个，插入一个
+                    other.setEndInt(tStart);
+                    super.save(other);
+                    TurnStSchedule added = new TurnStSchedule(other);
+                    added.setId(null);
+                    added.setStartInt(tEnd);
+                    super.save(added);
+                } else if (oStart < tStart) {
+                    //other在左边
+                    other.setEndInt(tStart);
+                    super.save(other);
+                } else if (oEnd > tEnd) {
+                    //other在右边
+                    other.setStartInt(tEnd);
+                    super.save(other);
+                } else {
+                    throw new UnsupportedOperationException("覆盖情况错误");
+                }
+            }
+        }
         super.save(turnStSchedule);
     }
 
@@ -150,7 +200,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                 String userId = user.getId();
                 for (TurnSTReqDepChild dep : reqDepList) {
                     String oughtLength = dep.getTimeLength() + " 个 " + ReqTimeUnit.getName(timeUnit);
-                    if (!scheMap.containsKey(userId) || scheMap.get(userId).containsKey(dep.getDepartmentId())) {
+                    if (!scheMap.containsKey(userId) || !scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
                         diffRet.add(diffRequirement(turnSTReqMain, user, dep, null, oughtLength));
                     } else {
@@ -223,9 +273,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         String thisStart = turnStSchedule.getStartYandM();
         String thisEnd = turnStSchedule.getEndYandM();
         if (reqStart.compareTo(thisStart) > 0 ||
-                reqStart.compareTo(thisEnd) > 0)
+                reqStart.compareTo(thisEnd) >= 0)
             return "本调度的开始/结束时间 早于 标准的开始时间：" + reqStart;
-        if (reqEnd.compareTo(thisStart) < 0 ||
+        if (reqEnd.compareTo(thisStart) <= 0 ||
                 reqEnd.compareTo(thisEnd) < 0)
             return "本调度的开始/结束时间 晚于 标准的结束时间：" + reqEnd;
 
@@ -240,7 +290,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         int endInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
                 turnStSchedule.getReqStartYAndM(), thisEnd,
                 turnStSchedule.getTimeUnit(), turnStSchedule.getEndMonthUpOrDown());
-        if (endInt < startInt)
+        if (endInt <= startInt)
             return "本调度的开始时间晚于结束时间";
         turnStSchedule.setStartInt(Integer.valueOf(startInt).toString());
         turnStSchedule.setEndInt(Integer.valueOf(endInt).toString());

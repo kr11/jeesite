@@ -47,6 +47,8 @@
         <input id="requirementId" name="requirementId" type="hidden" value="${turnStSchedule.requirementId}"/>
         <input id="startInt" name="startInt" type="hidden" value="${turnStSchedule.startInt}"/>
         <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
+        <%--<input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>--%>
+        <%--<input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>--%>
         <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
         <input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>
         <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>

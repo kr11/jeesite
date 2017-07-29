@@ -5,7 +5,7 @@
 	<sql id="turnStScheduleColumns">
 		a.id AS "id",
 		a.archive_id AS "archiveId",
-		a.user_id AS "user.id",
+		a.user_id AS "user",
 		a.user_name AS "userName",
 		a.requirement_id AS "requirementId",
 		a.dep_id AS "depId",
@@ -41,6 +41,12 @@
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
 			<if test="userName != null and userName != ''">
+				AND a.user_id = #{user}
+			</if>
+			<if test="depId != null and userName != ''">
+				AND a.dep_id = #{depId}
+			</if>
+			<if test="userName != null and userName != ''">
 				AND a.user_name = #{userName}
 			</if>
 			<if test="depName != null and depName != ''">
@@ -51,6 +57,9 @@
 			</if>
 			<if test="endInt != null and endInt != ''">
 				AND a.end_int &gt;= #{endInt}
+			</if>
+			<if test="archiveId != null and archiveId != ''">
+				AND a.archiveId = #{archiveId}
 			</if>
 		</where>
 		<choose>
@@ -101,7 +110,7 @@
 		) VALUES (
 			#{id},
 			#{archiveId},
-			#{user.id},
+			#{user},
 			#{userName},
 			#{requirementId},
 			#{depId},
