@@ -6,6 +6,7 @@ package com.thinkgem.jeesite.modules.turn.web.streq;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.service.department.TurnDepartmentService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -73,26 +74,11 @@ public class TurnSTReqMainController extends BaseController {
 		return "modules/turn/streq/turnSTReqMainForm";
 	}
 
-	private boolean checkYearAtMonth(String input){
-		if(input.indexOf("-") != 4 || input.length() != 4+1+2)
-			return false;
-		String[] ym = input.split("-");
-		try {
-			int y = Integer.parseInt(ym[0]);
-			if(y < 1)
-				return false;
-			int m = Integer.parseInt(ym[1]);
-			return m >= 1 && m <= 12;
-		}
-		catch (Exception e){
-			return false;
-		}
-	}
 	@RequiresPermissions("turn:streq:turnSTReqMain:edit")
 	@RequestMapping(value = "save")
 	public String save(TurnSTReqMain turnSTReqMain, Model model, RedirectAttributes redirectAttributes) {
-		if(!checkYearAtMonth(turnSTReqMain.getStartYAtM()) ||
-				! checkYearAtMonth(turnSTReqMain.getEndYAtM())) {
+		if(!ReqTimeUnit.checkYearAtMonth(turnSTReqMain.getStartYAtM()) ||
+				! ReqTimeUnit.checkYearAtMonth(turnSTReqMain.getEndYAtM())) {
 			addMessage(model, "开始/结束时间输入不合法");
 			return form(turnSTReqMain, model);
 		}

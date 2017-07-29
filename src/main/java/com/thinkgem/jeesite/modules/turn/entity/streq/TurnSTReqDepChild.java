@@ -9,63 +9,70 @@ import com.thinkgem.jeesite.common.persistence.DataEntity;
 
 /**
  * 排班-规培标准表Entity
+ *
  * @author Carrel
  * @version 2017-07-28
  */
 public class TurnSTReqDepChild extends DataEntity<TurnSTReqDepChild> {
-	
-	private static final long serialVersionUID = 1L;
-	private TurnSTReqMain requirementId;		// 所属标准编号 父类
-	private String departmentId;		// 科室_id
-	private String departmentName;		// 科室名
-	private String timeLength;		// 时间长度
-	
-	public TurnSTReqDepChild() {
-		super();
-	}
 
-	public TurnSTReqDepChild(String id){
-		super(id);
-	}
+    private static final long serialVersionUID = 1L;
+    private TurnSTReqMain requirementId;        // 所属标准编号 父类
+    private String departmentId;        // 科室_id
+    private String departmentName;        // 科室名
+    private String timeLength;        // 时间长度
 
-	public TurnSTReqDepChild(TurnSTReqMain requirementId){
-		this.requirementId = requirementId;
-	}
+    public TurnSTReqDepChild() {
+        super();
+    }
 
-	@Length(min=1, max=64, message="所属标准编号长度必须介于 1 和 64 之间")
-	public TurnSTReqMain getRequirementId() {
-		return requirementId;
-	}
+    public TurnSTReqDepChild(String id) {
+        super(id);
+    }
 
-	public void setRequirementId(TurnSTReqMain requirementId) {
-		this.requirementId = requirementId;
-	}
-	
-	@Length(min=1, max=64, message="科室_id长度必须介于 1 和 64 之间")
-	public String getDepartmentId() {
-		return departmentId;
-	}
+    public TurnSTReqDepChild(TurnSTReqMain requirementId) {
+        this.requirementId = requirementId;
+    }
 
-	public void setDepartmentId(String departmentId) {
-		this.departmentId = departmentId;
-	}
-	
-	@Length(min=1, max=64, message="科室名长度必须介于 1 和 64 之间")
-	public String getDepartmentName() {
-		return departmentName;
-	}
+    @Length(min = 1, max = 64, message = "所属标准编号长度必须介于 1 和 64 之间")
+    public TurnSTReqMain getRequirementId() {
+        return requirementId;
+    }
 
-	public void setDepartmentName(String departmentName) {
-		this.departmentName = departmentName;
-	}
-	
-	@Length(min=1, max=64, message="时间长度长度必须介于 1 和 64 之间")
-	public String getTimeLength() {
-		return timeLength;
-	}
+    public void setRequirementId(TurnSTReqMain requirementId) {
+        this.requirementId = requirementId;
+    }
 
-	public void setTimeLength(String timeLength) {
-		this.timeLength = timeLength;
-	}
-	
+    @Length(min = 1, max = 64, message = "科室_id长度必须介于 1 和 64 之间")
+    public String getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(String departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    @Length(min = 1, max = 64, message = "科室名长度必须介于 1 和 64 之间")
+    public String getDepartmentName() {
+        return departmentName;
+    }
+
+    public void setDepartmentName(String departmentName) {
+        this.departmentName = departmentName;
+    }
+
+    @Length(min = 1, max = 64, message = "时间长度长度必须介于 1 和 64 之间")
+    public String getTimeLength() {
+        return timeLength;
+    }
+
+//    public int getConvertedTimeLengthInt(String timeUnit) {
+//        return "月".equals(timeUnit) ?
+//                Integer.valueOf(timeLength) * 2:
+//                Integer.valueOf(timeLength);
+//    }
+
+    public void setTimeLength(String timeLength) {
+        this.timeLength = timeLength;
+    }
+
 }

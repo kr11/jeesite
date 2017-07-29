@@ -36,6 +36,9 @@ public class TestDataService extends CrudService<TestDataDao, TestData> {
 	
 	@Transactional(readOnly = false)
 	public void save(TestData testData) {
+		for (int i = 0; i < 30; i++) {
+			super.save(new TestData());
+		}
 		super.save(testData);
 	}
 	

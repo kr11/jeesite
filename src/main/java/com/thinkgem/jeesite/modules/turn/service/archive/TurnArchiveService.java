@@ -5,6 +5,7 @@ package com.thinkgem.jeesite.modules.turn.service.archive;
 
 import java.util.List;
 
+import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +48,7 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
 				}
 			}
 			super.save(turnArchive);
+			TurnConstant.currentArchive = turnArchive.getId();
 		}
 		else{
 			//关闭状态
@@ -60,8 +62,10 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
 			boolean hasOpen = false;
 			for (TurnArchive arch : allArch) {
 				if(arch.getBooleanIsOpen()){
-					if(!hasOpen)
+					if(!hasOpen) {
 						hasOpen = true;
+						TurnConstant.currentArchive = arch.getId();
+					}
 					else
 						throw new UnsupportedOperationException("there are more than one opened arch!");
 				}
@@ -70,6 +74,7 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
 				//全部关掉了，设置最近一个打开
 				allArch.get(0).setBooleanIsOpen(true);
 				dao.update(allArch.get(0));
+				TurnConstant.currentArchive = allArch.get(0).getId();
 			}
 		}
 	}
