@@ -34,34 +34,32 @@
 		<form:hidden path="id"/>
 		<sys:message content="${message}"/>		
 		<div class="control-group">
-			<label class="control-label">用户名：</label>
+            <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
+            <input id="user" name="user" type="hidden" value="${turnStSchedule.user}"/>
+            <label class="control-label">用户名：</label>
 			<div class="controls">
-				<form:select path="userName" class="input-xlarge required">
-					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-				</form:select>
+				<form:input path="userName" htmlEscape="false" value="${turnStSchedule.userName}"
+                            class="input-xlarge required" readonly="readonly"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label">科室名：</label>
-			<div class="controls">
-				<form:select path="depName" class="input-xlarge required">
-					<form:option value="" label=""/>
-					<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-				</form:select>
-				<span class="help-inline"><font color="red">*</font> </span>
-			</div>
+            <div class="controls">
+                <form:input path="depName" htmlEscape="false" value="${turnStSchedule.depName}"
+                            class="input-xlarge required" readonly="readonly"/>
+                <span class="help-inline"><font color="red">*</font> </span>
+            </div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">开始时间半月整数：</label>
+			<label class="control-label">开始时间（YYYY-MM-F/L）：</label>
 			<div class="controls">
 				<form:input path="startInt" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
 				<span class="help-inline"><font color="red">*</font> </span>
 			</div>
 		</div>
 		<div class="control-group">
-			<label class="control-label">结束时间半月整数：</label>
+			<label class="control-label">结束时间（YYYY-MM-F/L）：</label>
 			<div class="controls">
 				<form:input path="endInt" htmlEscape="false" maxlength="64" class="input-xlarge required"/>
 				<span class="help-inline"><font color="red">*</font> </span>

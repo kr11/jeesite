@@ -3,7 +3,13 @@ package com.thinkgem.jeesite.modules.turn;
 import java.util.concurrent.TimeUnit;
 
 public enum ReqTimeUnit {
-    halfmonth, onemonth, fiveweek;
+    halfmonth("半月"), onemonth("月"), fiveweek("五周");
+
+    ReqTimeUnit(String name) {
+        this.name = name;
+    }
+
+    private String name;
 
     public static int getConvertedTimeLengthInt(String timeLength, String timeUnit) {
         switch (ReqTimeUnit.valueOf(timeUnit)) {
@@ -67,5 +73,10 @@ public enum ReqTimeUnit {
         }
         n.getChars(0, n.length(), c, length - n.length());
         return new String(c);
+    }
+
+    public static String getName(String timeUnit) {
+
+        return ReqTimeUnit.valueOf(timeUnit).name;
     }
 }

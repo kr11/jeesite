@@ -7,10 +7,12 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
+import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqDepChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.stschedule.TurnStScheduleDao;
+import com.thinkgem.jeesite.modules.turn.entity.archive.TurnArchive;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
@@ -43,6 +45,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     @Autowired
     private TurnSTReqUserChildDao userChildDao;
 
+    @Autowired
+    private TurnArchiveDao turnArchiveDao;
+
     public TurnStSchedule get(String id) {
         return super.get(id);
     }
@@ -57,6 +62,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
 
     @Transactional(readOnly = false)
     public void save(TurnStSchedule turnStSchedule) {
+        turnStSchedule.setArchiveId(getArchiveId());
+        //转变
         super.save(turnStSchedule);
     }
 
@@ -71,7 +78,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      */
     private Map<String, Map<String, TurnStSchedule>> getUserToScheList(
             TurnStSchedule turnStSchedule) {
-        turnStSchedule.setArchiveId(TurnConstant.currentArchive);
+        turnStSchedule.setArchiveId(getArchiveId());
         final List<TurnStSchedule> currentSche = findList(turnStSchedule);
         //组织成userid->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = new HashMap<>();
@@ -139,7 +146,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             for (TurnSTReqUserChild user : reqUserList) {
                 String userId = user.getId();
                 for (TurnSTReqDepChild dep : reqDepList) {
-                    String oughtLength = dep.getTimeLength() + timeUnit;
+                    String oughtLength = dep.getTimeLength() + " 个 "+ReqTimeUnit.getName(timeUnit);
                     if (!scheMap.containsKey(userId) || scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
                         diffRet.add(diffRequirement(user, dep, null, oughtLength, timeUnit, startYAtM));
@@ -164,13 +171,27 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             String timeUnit, String startYatM) {
         TurnStSchedule ret = (userDepSche == null) ?
                 new TurnStSchedule() : new TurnStSchedule(userDepSche.getId());
-        ret.setDepName(turnSTReqDepChild.getDepartmentName());
+        ret.setDepName(turnSTReqDepChild.getDepartmentName().split("@")[1]);
         ret.setUserName(turnSTReqUserChild.getUserName());
         ret.setOughtTimeLength(oughtLength);
         if (userDepSche != null) {
             ret.setStartYandM(ReqTimeUnit.addYearAtMonth(timeUnit, startYatM, userDepSche.getStartIntInt()));
             ret.setEndInt(ReqTimeUnit.addYearAtMonth(timeUnit, startYatM, userDepSche.getEndIntInt()));
         }
+        else{
+            ret.setStartYandM("未设置");
+            ret.setEndYandM("未设置");
+        }
         return ret;
+    }
+
+    private String getArchiveId(){
+        if(TurnConstant.currentArchive == null){
+            TurnArchive arch = new TurnArchive();
+            arch.setBooleanIsOpen(true);
+            List<TurnArchive> openArch = turnArchiveDao.findList(arch);
+            TurnConstant.currentArchive = openArch.get(0).getId();
+        }
+        return TurnConstant.currentArchive;
     }
 }

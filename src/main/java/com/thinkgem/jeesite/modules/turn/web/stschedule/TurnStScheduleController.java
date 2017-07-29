@@ -22,6 +22,8 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStScheduleService;
 
+import java.util.List;
+
 /**
  * 排班-规培调度表Controller
  * @author Carrel
@@ -49,8 +51,9 @@ public class TurnStScheduleController extends BaseController {
 	@RequiresPermissions("turn:stschedule:turnStSchedule:view")
 	@RequestMapping(value = {"list", ""})
 	public String list(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model model) {
-		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response), turnStSchedule); 
-		model.addAttribute("page", page);
+//		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response), turnStSchedule);
+		List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
+		model.addAttribute("diffList", diffList);
 		return "modules/turn/stschedule/turnStScheduleList";
 	}
 

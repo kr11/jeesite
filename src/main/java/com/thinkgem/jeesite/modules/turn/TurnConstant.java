@@ -9,17 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-//@Transactional(readOnly = true)
+@Transactional(readOnly = true)
 public class TurnConstant {
-    @Autowired
-    static private TurnArchiveDao turnArchiveDao;
+//    @Autowired
+//    static private TurnArchiveDao turnArchiveDao;
 
-    static {
-        TurnArchive arch = new TurnArchive();
-        arch.setBooleanIsOpen(true);
-        List<TurnArchive> openArch = turnArchiveDao.findList(arch);
-        currentArchive = openArch.get(0).getId();
-    }
-    public static String currentArchive;
+    public static String currentArchive = null;
 
 }
