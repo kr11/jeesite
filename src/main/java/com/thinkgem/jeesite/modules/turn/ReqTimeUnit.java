@@ -49,9 +49,9 @@ public enum ReqTimeUnit {
             case halfmonth:
                 retString = convertInt_2_YYYY_MM(t, timeUnit);
                 if (isStart)
-                    ret.setStartMonthUpOrDown((((t & 1) == 1) ? "下半月" : "上半月"));
+                    ret.setStartMonthUpOrDown(oneTwo_convertTo_UpOrDown(t));
                 else
-                    ret.setEndMonthUpOrDown((((t & 1) == 1) ? "下半月" : "上半月"));
+                    ret.setEndMonthUpOrDown(oneTwo_convertTo_UpOrDown(t));
                 break;
             case onemonth:
                 retString = convertInt_2_YYYY_MM(t, timeUnit);
@@ -88,14 +88,54 @@ public enum ReqTimeUnit {
         return isHalfMonth(timeUnit) ? (srcY * 12 + srcM - 1) * 2 : (srcY * 12 + srcM - 1);
     }
 
-
+    /**
+     * 仅将int转化为年月形式，半月的上下，五周的日期都会都掉，仅内部
+     *
+     * @param t
+     * @param timeUnit
+     * @return
+     */
     private static String convertInt_2_YYYY_MM(int t, String timeUnit) {
-        if (isHalfMonth(timeUnit))
-            t /= 2;
-        int y = t / 12;
-        int m = t % 12;
-        return addZeroAtHeadForInt(y, 4)
-                + '-' + addZeroAtHeadForInt(m + 1, 2);
+        switch (ReqTimeUnit.valueOf(timeUnit)) {
+            case halfmonth:
+                t /= 2;
+            case onemonth:
+                int y = t / 12;
+                int m = t % 12;
+                return addZeroAtHeadForInt(y, 4)
+                        + '-' + addZeroAtHeadForInt(m + 1, 2);
+            case fiveweek:
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    /**
+     * int转化为:
+     * month：年月形式
+     * 半月：年月-上下半月，五周的日期都会都掉，仅内部
+     *
+     * @param t
+     * @param timeUnit
+     * @return
+     */
+    public static String convertInt_2_YYYY_MM_detail(int t, String timeUnit) {
+        switch (ReqTimeUnit.valueOf(timeUnit)) {
+            case halfmonth:
+                int y = t / 24;
+                int m = t % 24;
+                return addZeroAtHeadForInt(y, 4)
+                        + '-' + addZeroAtHeadForInt(m + 1, 2)
+                        + '-' + oneTwo_convertTo_UpOrDown(t);
+            case onemonth:
+                y = t / 12;
+                m = t % 12;
+                return addZeroAtHeadForInt(y, 4)
+                        + '-' + addZeroAtHeadForInt(m + 1, 2);
+            case fiveweek:
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     public static int calculate_Diff_YandM_2_Int(String startTime, String offsetTime,
@@ -114,5 +154,9 @@ public enum ReqTimeUnit {
 
     public static boolean isHalfMonth(String input) {
         return "halfmonth".equals(input);
+    }
+
+    public static String oneTwo_convertTo_UpOrDown(int i) {
+        return (i & 1) == 1 ? "下半月" : "上半月";
     }
 }

@@ -6,6 +6,7 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -92,4 +93,14 @@ public class TurnStScheduleController extends BaseController {
         return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
     }
 
+    @RequiresPermissions("turn:stschedule:turnStSchedule:view")
+    @RequestMapping(value = {"tableEdit"})
+    public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model
+            model) {
+//		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<>(request, response),
+// turnStSchedule);
+        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
+        model.addAttribute("editTableList", editTableList);
+        return "modules/turn/stschedule/turnStScheduleTable";
+    }
 }

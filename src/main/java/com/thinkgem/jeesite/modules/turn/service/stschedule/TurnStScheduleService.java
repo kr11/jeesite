@@ -3,8 +3,10 @@
  */
 package com.thinkgem.jeesite.modules.turn.service.stschedule;
 
+import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
+import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
@@ -17,17 +19,19 @@ import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
+import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable.StTableCell;
+import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable.StTableLine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.thinkgem.jeesite.modules.turn.ReqTimeUnit.addZeroAtHeadForInt;
 
 /**
  * 排班-规培调度表Service
@@ -67,7 +71,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
 
     @Transactional(readOnly = false)
     public void save(TurnStSchedule turnStSchedule) {
-        turnStSchedule.setArchiveId(getArchiveId());
+        turnStSchedule.setArchiveId(getOpenArchiveId());
         //除了id，其他的都已经有了，唯一可以编辑的就是start和end，这里处理一下
         //更新的同时，把自己的其他部分找出来，然后覆盖掉
         coverSelfOtherSche(turnStSchedule);
@@ -132,7 +136,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      */
     private Map<String, Map<String, TurnStSchedule>> getUserToScheList(
             TurnStSchedule turnStSchedule) {
-        turnStSchedule.setArchiveId(getArchiveId());
+        turnStSchedule.setArchiveId(getOpenArchiveId());
         final List<TurnStSchedule> currentSche = findList(turnStSchedule);
         //组织成userid->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = new HashMap<>();
@@ -207,7 +211,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                         //包含要求的科室，则判断长短
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
                         int actualLen = userDepSche.getEndIntInt() - userDepSche.getStartIntInt();
-                        if (ReqTimeUnit.getConvertedTimeLengthInt(dep.getTimeLength(), timeUnit) != actualLen) {
+//                        if (ReqTimeUnit.getConvertedTimeLengthInt(dep.getTimeLength(), timeUnit) != actualLen) {
+                        if (Integer.parseInt(dep.getTimeLength()) != actualLen) {
                             //长度不同，标记
                             diffRet.add(diffRequirement(turnSTReqMain, user, dep, userDepSche, oughtLength));
                         }
@@ -256,7 +261,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         return ret;
     }
 
-    private String getArchiveId() {
+    private String getOpenArchiveId() {
         if (TurnConstant.currentArchive == null) {
             TurnArchive arch = new TurnArchive();
             arch.setBooleanIsOpen(true);
@@ -264,6 +269,16 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             TurnConstant.currentArchive = openArch.get(0).getId();
         }
         return TurnConstant.currentArchive;
+    }
+
+    private int getTableStartInt(String timeUnit) {
+        TurnSTReqMain main = new TurnSTReqMain();
+        main.setArchiveId(getOpenArchiveId());
+        main.setTimgUnit(timeUnit);
+        List<TurnSTReqMain> archMain = reqMainDao.findList(main);
+        return ReqTimeUnit.convertYYYY_MM_2Int(archMain.get(0).getStartYAtM(), timeUnit);
+//        TurnConstant.currentStTableStartYAndM = ;
+//        return TurnConstant.currentStTableStartYAndM;
     }
 
 
@@ -296,4 +311,87 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         turnStSchedule.setEndInt(Integer.valueOf(endInt).toString());
         return null;
     }
+
+    /**
+     * 返回指定时间段表格，可编辑。
+     *
+     * @param turnStSchedule
+     * @return
+     */
+    public TurnStTable calculateCurrentTable(TurnStSchedule turnStSchedule) {
+        //如果没有设置，则设置页面的时间类型，默认是onemonth
+        if (StringUtils.isBlank(turnStSchedule.getTimeUnit()))
+            turnStSchedule.setTimeUnit(ReqTimeUnit.onemonth.toString());
+        //如果没有设置，则设置页面的页面大小，允许在table页面设置，默认是properties中的值
+        if (turnStSchedule.getTablePageSize() == -1)
+            turnStSchedule.setTablePageSize(Integer.parseInt(Global.getConfig("turnTable.defaultSize")));
+        //错：如果没有设置，则设置页面的开始时间：改为：不允许设置，直接自动获取
+//        if (turnStSchedule.getTableStart() == -1) {
+        turnStSchedule.setTablePageSize(getTableStartInt(turnStSchedule.getTimeUnit()));
+//        }
+        //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
+        turnStSchedule.setArchiveId(getOpenArchiveId());
+        //开始时间结束时间的查询条件设置：
+        setIntersect(turnStSchedule);
+        List<TurnStSchedule> scheList = findList(turnStSchedule);
+        TurnStTable tableList = constructEditTable(turnStSchedule, scheList);
+        return tableList;
+    }
+
+    private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, List<TurnStSchedule> scheList) {
+        TurnStTable retTable = new TurnStTable();
+        int startInt = turnStSchedule.getTableStart();
+        int tableSize = turnStSchedule.getTablePageSize();
+        String timeUnit = turnStSchedule.getTimeUnit();
+        //时间表头
+        List<String> dateList = new ArrayList<>();
+        for (int i = 0; i < turnStSchedule.getTablePageSize(); i++) {
+            dateList.add(ReqTimeUnit.convertInt_2_YYYY_MM_detail(startInt + i, timeUnit));
+        }
+        retTable.setDateList(dateList);
+        //每行表身
+        Map<String, StTableLine> depLineMap = new HashMap<>();
+        for (TurnStSchedule stSchedule : scheList) {
+            String depId = stSchedule.getDepId();
+            String userName = stSchedule.getUserName();
+            StTableLine line;
+            if (!depLineMap.containsKey(depId)) {
+                line = depLineMap.get(depId);
+                //line header:0：depId，1：depName
+                line.addLineHeader(depId);
+                line.addLineHeader(stSchedule.getDepName());
+                line.setCellList(new ArrayList<>(tableSize));
+                depLineMap.put(depId, line);
+            } else {
+                line = depLineMap.get(depId);
+            }
+            List<StTableCell> cellList = line.getCellList();
+            for (int i = Math.max(startInt, stSchedule.getStartIntInt());
+                 i < Math.min(startInt + tableSize, stSchedule.getEndIntInt()); i++) {
+                StTableCell cell = cellList.get(i - startInt);
+                if(cell.getCellHeaderList().isEmpty()){
+                    //初始化cell头
+                    //cell 在st中的标准：header:0：cellTimeInt，绝对时间整数
+                    cell.addCellHeader(Integer.valueOf(i).toString());
+                }
+                //加入名字
+                cell.addCellContent(userName);
+            }
+        }
+        retTable.setLineList(new ArrayList<>(depLineMap.values()));
+        return retTable;
+    }
+
+    /**
+     * 开始时间结束时间的查询条件设置
+     *
+     * @param turnStSchedule
+     */
+    private void setIntersect(TurnStSchedule turnStSchedule) {
+        // 对于aSt,aEnd,以及查询条件的s，e,找出与[s,e)相交的部分，条件为s<aEnd and e > aSt
+        //sql里的条件是：a.start_int < #{startInt} AND a.end_int > #{endInt}
+        turnStSchedule.setStartInt(turnStSchedule.getEndInt());
+        turnStSchedule.setEndInt(turnStSchedule.getStartInt());
+    }
+
 }

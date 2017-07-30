@@ -9,6 +9,7 @@
 			
 		});
 		function page(n,s){
+//            $("#pageStart").val(st);
 			$("#pageNo").val(n);
 			$("#pageSize").val(s);
 			$("#searchForm").submit();
@@ -18,12 +19,13 @@
 </head>
 <body>
 	<ul class="nav nav-tabs">
-		<li class="active"><a href="${ctx}/turn/stschedule/turnStSchedule/">排班-表格</a></li>
-		<shiro:hasPermission name="turn:stschedule:turnStSchedule:edit"><li><a href="${ctx}/turn/stschedule/turnStSchedule/form">排班-规培调度表添加</a></li></shiro:hasPermission>
+		<li class="active"><a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit">排班-表格</a></li>
+		<%--<shiro:hasPermission name="turn:stschedule:turnStSchedule:edit"><li><a href="${ctx}/turn/stschedule/turnStSchedule/form">排班-规培调度表添加</a></li></shiro:hasPermission>--%>
 	</ul>
-	<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/" method="post" class="breadcrumb form-search">
-		<input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
-		<input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+	<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/tableEdit" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${pageNo}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${pageSize}"/>
+		<input id="pageStart" name="pageStart" type="hidden" value="${pageStart}"/>
 		<ul class="ul-form">
 			<li><label>用户名：</label>
 				<form:input path="userName" htmlEscape="false" maxlength="64" class="input-medium"/>
@@ -75,6 +77,10 @@
 		</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination"><ul>
+		<li><a href="javascript:" onclick="page(${pageNo-1},'');">« 上一页</a></li>
+		<li><a href="javascript:" onclick="page(${pageNo+1},'');">下一页  »</a></li>
+	</ul>
+		<div style="clear:both;"></div></div>
 </body>
 </html>

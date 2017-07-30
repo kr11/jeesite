@@ -53,13 +53,13 @@
 				AND a.dep_name = #{depName}
 			</if>
 			<if test="startInt != null and startInt != ''">
-				AND a.start_int &lt;= #{startInt}
+				AND a.start_int &lt; #{startInt}
 			</if>
 			<if test="endInt != null and endInt != ''">
-				AND a.end_int &gt;= #{endInt}
+				AND a.end_int &gt; #{endInt}
 			</if>
 			<if test="archiveId != null and archiveId != ''">
-				AND a.archiveId = #{archiveId}
+				AND a.archive_id = #{archiveId}
 			</if>
 		</where>
 		<choose>

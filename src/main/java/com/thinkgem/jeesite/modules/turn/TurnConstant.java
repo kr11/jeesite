@@ -16,4 +16,6 @@ public class TurnConstant {
 
     public static String currentArchive = null;
 
+    public static String currentStTableStartYAndM = null;
+
 }

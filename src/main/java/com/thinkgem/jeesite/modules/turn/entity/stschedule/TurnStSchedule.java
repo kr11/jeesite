@@ -35,6 +35,11 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     private String endMonthUpOrDown;
     private String timeUnit;
 
+    private int tablePageSize=-1;//table中，单页的大小
+    private int tableStart=-1;//table中，从哪里开始
+    //table相关的配置
+//    private int tableStartInt;
+
     public TurnStSchedule(TurnStSchedule turnStSchedule) {
         super(turnStSchedule.getId());
         this.archiveId = turnStSchedule.archiveId;
@@ -218,6 +223,30 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     public void setReqEndYAndM(String reqEndYAndM) {
         this.reqEndYAndM = reqEndYAndM;
     }
+
+    public int getTablePageSize() {
+        return tablePageSize;
+    }
+
+    public void setTablePageSize(int tablePageSize) {
+        this.tablePageSize = tablePageSize;
+    }
+
+    public int getTableStart() {
+        return tableStart;
+    }
+
+    public void setTableStart(int tableStart) {
+        this.tableStart = tableStart;
+    }
+
+//    public int getTableStartInt() {
+//        return tableStartInt;
+//    }
+//
+//    public void setTableStartInt(int tableStartInt) {
+//        this.tableStartInt = tableStartInt;
+//    }
 
 //    /**
 //     * 选出这样的对象，param时间段完全包含了他们
