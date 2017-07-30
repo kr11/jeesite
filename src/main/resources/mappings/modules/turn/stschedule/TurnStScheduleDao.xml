@@ -40,10 +40,10 @@
 		<include refid="turnStScheduleJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
-			<if test="userName != null and userName != ''">
+			<if test="user != null and user != ''">
 				AND a.user_id = #{user}
 			</if>
-			<if test="depId != null and userName != ''">
+			<if test="depId != null and depId != ''">
 				AND a.dep_id = #{depId}
 			</if>
 			<if test="userName != null and userName != ''">

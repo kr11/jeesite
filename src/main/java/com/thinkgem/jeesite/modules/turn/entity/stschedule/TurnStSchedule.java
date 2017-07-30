@@ -34,6 +34,7 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     private String startMonthUpOrDown;
     private String endMonthUpOrDown;
     private String timeUnit;
+    private String timeUnitSysTemName;
 
     private int tablePageSize=-1;//table中，单页的大小
     private int tableStart=-1;//table中，从哪里开始
@@ -86,6 +87,7 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
 
     public void setTimeUnit(String timeUnit) {
         this.timeUnit = timeUnit;
+        this.timeUnitSysTemName = ReqTimeUnit.getTurnSysName(timeUnit);
     }
 
     public TurnStSchedule() {
@@ -238,6 +240,14 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
 
     public void setTableStart(int tableStart) {
         this.tableStart = tableStart;
+    }
+
+    public String getTimeUnitSysTemName() {
+        return timeUnitSysTemName;
+    }
+
+    public void setTimeUnitSysTemName(String timeUnitSysTemName) {
+        this.timeUnitSysTemName = timeUnitSysTemName;
     }
 
 //    public int getTableStartInt() {

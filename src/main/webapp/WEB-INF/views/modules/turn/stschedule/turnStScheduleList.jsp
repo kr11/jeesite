@@ -19,10 +19,10 @@
 </head>
 <body>
 <ul class="nav nav-tabs">
-    <li class="active"><a href="${ctx}/turn/stschedule/turnStSchedule/">排班-规培调度表列表</a></li>
-    <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
-        <li><a href="${ctx}/turn/stschedule/turnStSchedule/form">排班-规培调度表添加</a></li>
-    </shiro:hasPermission>
+    <li >
+        <a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit?timeUnit=${turnStSchedule.timeUnit}">${turnStSchedule.timeUnitSysTemName}-排班</a>
+    </li>
+    <li class="active"><a href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
 </ul>
 <form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/" method="post"
            class="breadcrumb form-search">
@@ -47,7 +47,7 @@
         <li><label>结束时间半月整数：</label>
             <form:input path="endInt" htmlEscape="false" maxlength="64" class="input-medium"/>
         </li>
-        <li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
+        <li class="btns"><input id="btnSubmit2" class="btn btn-primary" type="submit" value="查询"/></li>
         <li class="clearfix"></li>
     </ul>
 </form:form>
@@ -72,8 +72,8 @@
                     <%--<a href="${ctx}/turn/stschedule/turnStSchedule/form?id=${turnStSchedule.id}">--%>
                     <%--${turnStSchedule.userName}--%>
                     <%--</a>--%>
-                <a onclick="$(searchForm${turnStSchedule.userName}${turnStSchedule.depName}).submit()">${turnStSchedule.userName}</a>
-                <form:form id="searchForm${turnStSchedule.userName}${turnStSchedule.depName}"
+                <a onclick="$(searchForm${turnStSchedule.user}${turnStSchedule.depId}).submit()">${turnStSchedule.userName}</a>
+                <form:form id="searchForm${turnStSchedule.user}${turnStSchedule.depId}"
                            modelAttribute="turnStSchedule"
                            action="${ctx}/turn/stschedule/turnStSchedule/form" style="display:none" method="post">
                     <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>

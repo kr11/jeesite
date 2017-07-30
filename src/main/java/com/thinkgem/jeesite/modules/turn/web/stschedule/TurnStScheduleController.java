@@ -6,6 +6,7 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,11 @@ public class TurnStScheduleController extends BaseController {
     @RequiresPermissions("turn:stschedule:turnStSchedule:view")
     @RequestMapping(value = "form")
     public String form(TurnStSchedule turnStSchedule, Model model) {
+        if(StringUtils.isBlank(turnStSchedule.getTimeUnit()))
+            throw new UnsupportedOperationException("timeunit can never be null");
+        if(StringUtils.isBlank(turnStSchedule.getTimeUnit())){
+            turnStSchedule.setTimeUnit(turnStSchedule.getTimeUnit());
+        }
         model.addAttribute("turnStSchedule", turnStSchedule);
         return "modules/turn/stschedule/turnStScheduleForm";
     }
@@ -73,7 +79,7 @@ public class TurnStScheduleController extends BaseController {
     public String save(TurnStSchedule turnStSchedule, Model model, RedirectAttributes redirectAttributes) {
         //在验证最终写入的数据之前，先转化起止时间，然后验证，然后save的时候去更改自己人的其他东西
         String ret = turnStScheduleService.convertStartAndEndTime(model, turnStSchedule);
-        if(ret != null){
+        if (ret != null) {
             addMessage(model, ret);
             return form(turnStSchedule, model);
         }
@@ -93,12 +99,22 @@ public class TurnStScheduleController extends BaseController {
         return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
     }
 
+    /**
+     * 一月，即规培的非助理全科部分
+     *
+     * @param turnStSchedule
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
     @RequiresPermissions("turn:stschedule:turnStSchedule:view")
     @RequestMapping(value = {"tableEdit"})
-    public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model
-            model) {
+    public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
+                            Model model) {
         TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
         model.addAttribute("editTableList", editTableList);
         return "modules/turn/stschedule/turnStScheduleTable";
     }
+
 }

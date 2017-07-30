@@ -27,11 +27,13 @@
 </head>
 <body>
 <ul class="nav nav-tabs">
-    <li><a href="${ctx}/turn/stschedule/turnStSchedule/">排班-规培调度表列表</a></li>
+    <li>
+        <a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit?timeUnit=${turnStSchedule.timeUnit}">${turnStSchedule.timeUnitSysTemName}-排班</a>
+    </li>
+    <li><a href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
     <li class="active"><a
-            href="${ctx}/turn/stschedule/turnStSchedule/form?id=${turnStSchedule.id}">排班-规培调度表<shiro:hasPermission
-            name="turn:stschedule:turnStSchedule:edit">${not empty turnStSchedule.id?'修改':'添加'}</shiro:hasPermission><shiro:lacksPermission
-            name="turn:stschedule:turnStSchedule:edit">查看</shiro:lacksPermission></a></li>
+            href="${ctx}/turn/stschedule/turnStSchedule/form?timeUnit=${turnStSchedule.timeUnit}&id=${turnStSchedule.id}">
+        排班记录${not empty turnStSchedule.id?'修改':'添加'}</a></li>
 </ul>
 <br/>
 <form:form id="inputForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/save"
@@ -47,8 +49,8 @@
         <input id="requirementId" name="requirementId" type="hidden" value="${turnStSchedule.requirementId}"/>
         <input id="startInt" name="startInt" type="hidden" value="${turnStSchedule.startInt}"/>
         <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
-        <%--<input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>--%>
-        <%--<input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>--%>
+            <%--<input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>--%>
+            <%--<input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>--%>
         <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
         <input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>
         <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>

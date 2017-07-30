@@ -1,5 +1,7 @@
 package com.thinkgem.jeesite.modules.turn.service.stschedule;
 
+import org.omg.CORBA.ContextList;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +33,7 @@ public class TurnStTable {
      * 单行类
      */
     public static class StTableLine {
+        //对于规培来说：line header:0：depId，1：depName
         private List<String> lineHeader;
 
         private List<StTableCell> cellList;
@@ -103,6 +106,19 @@ public class TurnStTable {
                 this.cellHeaderList = new ArrayList<>();
             }
             this.cellHeaderList.add(cellHeader);
+        }
+
+        @Override
+        public String toString() {
+            if (cellContentList.isEmpty())
+                return "";
+            StringBuilder sb = new StringBuilder();
+            int i;
+            for (i = 0; i < cellContentList.size() - 1; i++) {
+                sb.append(cellContentList.get(i)).append(",");
+            }
+            sb.append(cellContentList.get(i));
+            return sb.toString();
         }
     }
 }

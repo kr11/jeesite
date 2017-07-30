@@ -252,8 +252,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
 
         ret.setTimeUnit(timeUnit);
         if (userDepSche != null) {
-            ReqTimeUnit.addYearAtMonth(true, ret, timeUnit, startYAtM, userDepSche.getStartIntInt());
-            ReqTimeUnit.addYearAtMonth(false, ret, timeUnit, startYAtM, userDepSche.getEndIntInt());
+            ReqTimeUnit.setYY_MM_UP_DD(true, ret, timeUnit, userDepSche.getStartIntInt());
+            ReqTimeUnit.setYY_MM_UP_DD(false, ret, timeUnit, userDepSche.getEndIntInt());
         } else {
             ret.setStartYandM("未设置");
             ret.setEndYandM("未设置");
@@ -276,7 +276,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         main.setArchiveId(getOpenArchiveId());
         main.setTimgUnit(timeUnit);
         List<TurnSTReqMain> archMain = reqMainDao.findList(main);
-        return ReqTimeUnit.convertYYYY_MM_2Int(archMain.get(0).getStartYAtM(), timeUnit);
+        //规培的开始阶段一定是整数，所以halfmonth传一个上半月即可
+        return ReqTimeUnit.convertYYYY_MM_2Int(archMain.get(0).getStartYAtM(), timeUnit, "上半月");
 //        TurnConstant.currentStTableStartYAndM = ;
 //        return TurnConstant.currentStTableStartYAndM;
     }
@@ -299,12 +300,11 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             return "开始/结束时间输入不合法";
         }
 
-        int startInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
-                turnStSchedule.getReqStartYAndM(), thisStart,
-                turnStSchedule.getTimeUnit(), turnStSchedule.getStartMonthUpOrDown());
-        int endInt = ReqTimeUnit.calculate_Diff_YandM_2_Int(
-                turnStSchedule.getReqStartYAndM(), thisEnd,
-                turnStSchedule.getTimeUnit(), turnStSchedule.getEndMonthUpOrDown());
+        int startInt = ReqTimeUnit.convertYYYY_MM_2Int(thisStart, turnStSchedule.getTimeUnit(),
+                turnStSchedule.getStartMonthUpOrDown());
+
+        int endInt = ReqTimeUnit.convertYYYY_MM_2Int(thisEnd, turnStSchedule.getTimeUnit(),
+                turnStSchedule.getEndMonthUpOrDown());
         if (endInt <= startInt)
             return "本调度的开始时间晚于结束时间";
         turnStSchedule.setStartInt(Integer.valueOf(startInt).toString());
@@ -327,7 +327,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             turnStSchedule.setTablePageSize(Integer.parseInt(Global.getConfig("turnTable.defaultSize")));
         //错：如果没有设置，则设置页面的开始时间：改为：不允许设置，直接自动获取
 //        if (turnStSchedule.getTableStart() == -1) {
-        turnStSchedule.setTablePageSize(getTableStartInt(turnStSchedule.getTimeUnit()));
+        turnStSchedule.setTableStart(getTableStartInt(turnStSchedule.getTimeUnit()));
 //        }
         //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
         turnStSchedule.setArchiveId(getOpenArchiveId());
@@ -356,7 +356,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             String userName = stSchedule.getUserName();
             StTableLine line;
             if (!depLineMap.containsKey(depId)) {
-                line = depLineMap.get(depId);
+                line = new StTableLine();
                 //line header:0：depId，1：depName
                 line.addLineHeader(depId);
                 line.addLineHeader(stSchedule.getDepName());
@@ -369,7 +369,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             for (int i = Math.max(startInt, stSchedule.getStartIntInt());
                  i < Math.min(startInt + tableSize, stSchedule.getEndIntInt()); i++) {
                 StTableCell cell = cellList.get(i - startInt);
-                if(cell.getCellHeaderList().isEmpty()){
+                if (cell.getCellHeaderList().isEmpty()) {
                     //初始化cell头
                     //cell 在st中的标准：header:0：cellTimeInt，绝对时间整数
                     cell.addCellHeader(Integer.valueOf(i).toString());
