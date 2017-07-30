@@ -2,16 +2,16 @@ package com.thinkgem.jeesite.modules.turn;
 
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 
-import java.util.concurrent.TimeUnit;
-
 public enum ReqTimeUnit {
-    halfmonth("半月"), onemonth("月"), fiveweek("五周");
+    halfmonth("半月","助理全科"), onemonth("月","规培（无助理）"), fiveweek("五周","实习");
 
-    ReqTimeUnit(String name) {
+    ReqTimeUnit(String name, String turnSysName) {
         this.name = name;
+        this.turnSysName = turnSysName;
     }
 
     private String name;
+    private String turnSysName;
 
     public static int getConvertedTimeLengthInt(String timeLength, String timeUnit) {
         switch (ReqTimeUnit.valueOf(timeUnit)) {
@@ -158,5 +158,13 @@ public enum ReqTimeUnit {
 
     public static String oneTwo_convertTo_UpOrDown(int i) {
         return (i & 1) == 1 ? "下半月" : "上半月";
+    }
+
+    public String getTurnSysName() {
+        return turnSysName;
+    }
+
+    public void setTurnSysName(String turnSysName) {
+        this.turnSysName = turnSysName;
     }
 }

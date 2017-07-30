@@ -97,8 +97,6 @@ public class TurnStScheduleController extends BaseController {
     @RequestMapping(value = {"tableEdit"})
     public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model
             model) {
-//		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<>(request, response),
-// turnStSchedule);
         TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
         model.addAttribute("editTableList", editTableList);
         return "modules/turn/stschedule/turnStScheduleTable";
