@@ -10,7 +10,7 @@
 		a.end_y_at_m AS "endYAtM",
 		a.total_length AS "totalLength",
 		a.create_by AS "createBy.id",
-		a.timg_unit AS "timgUnit",
+		a.time_unit AS "timeUnit",
 		a.create_date AS "createDate",
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
@@ -41,6 +41,9 @@
 			</if>
 			<if test="totalLength != null and totalLength != ''">
 				AND a.total_length = #{totalLength}
+			</if>
+			<if test="timeUnit != null and timeUnit != ''">
+				AND a.time_unit = #{timeUnit}
 			</if>
 		</where>
 		<choose>
@@ -80,7 +83,7 @@
 			end_y_at_m,
 			total_length,
 			create_by,
-			timg_unit,
+			time_unit,
 			create_date,
 			update_by,
 			update_date,
@@ -94,7 +97,7 @@
 			#{endYAtM},
 			#{totalLength},
 			#{createBy.id},
-			#{timgUnit},
+			#{timeUnit},
 			#{createDate},
 			#{updateBy.id},
 			#{updateDate},
@@ -109,7 +112,7 @@
 			start_y_at_m = #{startYAtM},
 			end_y_at_m = #{endYAtM},
 			total_length = #{totalLength},
-			timg_unit = #{timgUnit},
+			time_unit = #{timeUnit},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks}

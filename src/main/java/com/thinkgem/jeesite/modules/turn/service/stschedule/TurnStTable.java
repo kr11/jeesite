@@ -110,7 +110,7 @@ public class TurnStTable {
 
         @Override
         public String toString() {
-            if (cellContentList.isEmpty())
+            if (cellContentList == null || cellContentList.isEmpty())
                 return "";
             StringBuilder sb = new StringBuilder();
             int i;

@@ -7,7 +7,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.Lists;
 
@@ -98,12 +97,12 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
     }
 
     @Length(min = 1, max = 64, message = "时间单位长度必须介于 1 和 64 之间")
-    public String getTimgUnit() {
+    public String getTimeUnit() {
         return timeUnit;
     }
 
-    public void setTimgUnit(String timgUnit) {
-        this.timeUnit = timgUnit;
+    public void setTimeUnit(String timeUnit) {
+        this.timeUnit = timeUnit;
     }
 
     public List<TurnSTReqDepChild> getTurnSTReqDepChildList() {

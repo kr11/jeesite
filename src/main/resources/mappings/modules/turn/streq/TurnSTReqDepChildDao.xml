@@ -41,6 +41,9 @@
 			<if test="departmentName != null and departmentName != ''">
 				AND a.department_name = #{departmentName}
 			</if>
+			<if test="departmentId != null and departmentId != ''">
+				AND a.department_id = #{departmentId}
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">

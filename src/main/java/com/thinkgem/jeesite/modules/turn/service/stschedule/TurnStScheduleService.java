@@ -26,12 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 排班-规培调度表Service
@@ -102,13 +97,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                     //完全覆盖，删除other
                     delete(other);
                 } else if (tStart > oStart && tEnd < oEnd) {
-                    //被截断成两个，更新一个，插入一个
+                    //错误：被截断成两个，更新一个，插入一个
+                    //更改为：被截断成两个，更新前面的，删掉后面的
+//                    TurnStSchedule added = new TurnStSchedule(other);
                     other.setEndInt(tStart);
                     super.save(other);
-                    TurnStSchedule added = new TurnStSchedule(other);
-                    added.setId(null);
-                    added.setStartInt(tEnd);
-                    super.save(added);
+//                    added.setId(null);
+//                    added.setStartInt(tEnd);
+//                    super.save(added);
                 } else if (oStart < tStart) {
                     //other在左边
                     other.setEndInt(tStart);
@@ -137,13 +133,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private Map<String, Map<String, TurnStSchedule>> getUserToScheList(
             TurnStSchedule turnStSchedule) {
         turnStSchedule.setArchiveId(getOpenArchiveId());
+        setIntersect(turnStSchedule);
         final List<TurnStSchedule> currentSche = findList(turnStSchedule);
         //组织成userid->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = new HashMap<>();
         for (final TurnStSchedule stSchedule : currentSche) {
             String userId = stSchedule.getUser();
             if (!scheMap.containsKey(userId)) {
-                scheMap.put(userId, new HashMap<>());
+                scheMap.put(userId, new HashMap<String, TurnStSchedule>());
 //                userToReqIdMap.put(userId, stSchedule.getRequirementId());
             }
             scheMap.get(userId).put(stSchedule.getDepId(), stSchedule);
@@ -157,9 +154,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      *
      * @return
      */
-    private List<TurnSTReqMain> getReqMap() {
+    private List<TurnSTReqMain> getReqMap(TurnStSchedule turnStSchedule) {
         TurnSTReqMain main = new TurnSTReqMain();
         main.setArchiveId(TurnConstant.currentArchive);
+        main.setTimeUnit(turnStSchedule.getTimeUnit());
         return reqMainDao.findList(main);
     }
 
@@ -168,9 +166,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      *
      * @return
      */
-    private List<TurnSTReqDepChild> getReqDepList(String stReqMainId) {
+    private List<TurnSTReqDepChild> getReqDepList(String stReqMainId, TurnStSchedule turnStSchedule) {
         TurnSTReqDepChild depChild = new TurnSTReqDepChild();
         depChild.setRequirementId(new TurnSTReqMain(stReqMainId));
+        depChild.setDepartmentId(turnStSchedule.getDepId());
         return depChildDao.findList(depChild);
     }
 
@@ -191,15 +190,15 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     public List<TurnStSchedule> calculateDiff(TurnStSchedule turnStSchedule) {
         //user->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = getUserToScheList(turnStSchedule);
-        List<TurnSTReqMain> stReqList = getReqMap();
+        List<TurnSTReqMain> stReqList = getReqMap(turnStSchedule);
         //获取所有的当年的标准并放入map
         List<TurnStSchedule> diffRet = new ArrayList<>();
         //这一年的所有标准
         for (TurnSTReqMain turnSTReqMain : stReqList) {
-            String timeUnit = turnSTReqMain.getTimgUnit();
+            String timeUnit = turnSTReqMain.getTimeUnit();
             //每一个标准的所有人和科室
             List<TurnSTReqUserChild> reqUserList = getReqUserList(turnSTReqMain.getId());
-            List<TurnSTReqDepChild> reqDepList = getReqDepList(turnSTReqMain.getId());
+            List<TurnSTReqDepChild> reqDepList = getReqDepList(turnSTReqMain.getId(), turnStSchedule);
             for (TurnSTReqUserChild user : reqUserList) {
                 String userId = user.getId();
                 for (TurnSTReqDepChild dep : reqDepList) {
@@ -212,7 +211,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
                         int actualLen = userDepSche.getEndIntInt() - userDepSche.getStartIntInt();
 //                        if (ReqTimeUnit.getConvertedTimeLengthInt(dep.getTimeLength(), timeUnit) != actualLen) {
-                        if (Integer.parseInt(dep.getTimeLength()) != actualLen) {
+                        //如果设置为显示正确，则直接添加
+                        if ("1".equals(turnStSchedule.getIsShowCorrect()) || Integer.parseInt(dep.getTimeLength()) !=
+                                actualLen) {
                             //长度不同，标记
                             diffRet.add(diffRequirement(turnSTReqMain, user, dep, userDepSche, oughtLength));
                         }
@@ -246,7 +247,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         ret.setOughtTimeLength(oughtLength);
         String startYAtM = turnSTReqMain.getStartYAtM();
         String endYAtM = turnSTReqMain.getEndYAtM();
-        String timeUnit = turnSTReqMain.getTimgUnit();
+        String timeUnit = turnSTReqMain.getTimeUnit();
         ret.setReqStartYAndM(startYAtM);
         ret.setReqEndYAndM(endYAtM);
 
@@ -274,7 +275,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private int getTableStartInt(String timeUnit) {
         TurnSTReqMain main = new TurnSTReqMain();
         main.setArchiveId(getOpenArchiveId());
-        main.setTimgUnit(timeUnit);
+        main.setTimeUnit(timeUnit);
         List<TurnSTReqMain> archMain = reqMainDao.findList(main);
         //规培的开始阶段一定是整数，所以halfmonth传一个上半月即可
         return ReqTimeUnit.convertYYYY_MM_2Int(archMain.get(0).getStartYAtM(), timeUnit, "上半月");
@@ -327,18 +328,25 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             turnStSchedule.setTablePageSize(Integer.parseInt(Global.getConfig("turnTable.defaultSize")));
         //错：如果没有设置，则设置页面的开始时间：改为：不允许设置，直接自动获取
 //        if (turnStSchedule.getTableStart() == -1) {
-        turnStSchedule.setTableStart(getTableStartInt(turnStSchedule.getTimeUnit()));
+        if (turnStSchedule.getTableStart() == -1)
+            turnStSchedule.setTableStart(getTableStartInt(turnStSchedule.getTimeUnit()));
 //        }
         //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
         turnStSchedule.setArchiveId(getOpenArchiveId());
         //开始时间结束时间的查询条件设置：
         setIntersect(turnStSchedule);
         List<TurnStSchedule> scheList = findList(turnStSchedule);
-        TurnStTable tableList = constructEditTable(turnStSchedule, scheList);
+        //获取人的id->name
+        TurnSTReqUserChild depChild = new TurnSTReqUserChild();
+        List<TurnSTReqUserChild> userList = userChildDao.findList(depChild);
+        Map<String, String> userIdNameMap = new HashMap<>();
+        userList.forEach(u -> userIdNameMap.put(u.getId(), u.getUserName()));
+        TurnStTable tableList = constructEditTable(turnStSchedule, scheList, userIdNameMap);
         return tableList;
     }
 
-    private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, List<TurnStSchedule> scheList) {
+    private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, List<TurnStSchedule> scheList, Map<String,
+            String> userIdNameMap) {
         TurnStTable retTable = new TurnStTable();
         int startInt = turnStSchedule.getTableStart();
         int tableSize = turnStSchedule.getTablePageSize();
@@ -353,14 +361,17 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         Map<String, StTableLine> depLineMap = new HashMap<>();
         for (TurnStSchedule stSchedule : scheList) {
             String depId = stSchedule.getDepId();
-            String userName = stSchedule.getUserName();
+//            String userName = stSchedule.getUserName();
+            String userName = userIdNameMap.get(stSchedule.getUser());
             StTableLine line;
             if (!depLineMap.containsKey(depId)) {
                 line = new StTableLine();
                 //line header:0：depId，1：depName
                 line.addLineHeader(depId);
                 line.addLineHeader(stSchedule.getDepName());
-                line.setCellList(new ArrayList<>(tableSize));
+                for (int i = 0; i < tableSize; i++) {
+                    line.addCell(new StTableCell());
+                }
                 depLineMap.put(depId, line);
             } else {
                 line = depLineMap.get(depId);
@@ -369,7 +380,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             for (int i = Math.max(startInt, stSchedule.getStartIntInt());
                  i < Math.min(startInt + tableSize, stSchedule.getEndIntInt()); i++) {
                 StTableCell cell = cellList.get(i - startInt);
-                if (cell.getCellHeaderList().isEmpty()) {
+                if (cell.getCellHeaderList() == null || cell.getCellHeaderList().isEmpty()) {
                     //初始化cell头
                     //cell 在st中的标准：header:0：cellTimeInt，绝对时间整数
                     cell.addCellHeader(Integer.valueOf(i).toString());
@@ -390,8 +401,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private void setIntersect(TurnStSchedule turnStSchedule) {
         // 对于aSt,aEnd,以及查询条件的s，e,找出与[s,e)相交的部分，条件为s<aEnd and e > aSt
         //sql里的条件是：a.start_int < #{startInt} AND a.end_int > #{endInt}
+        String temp = turnStSchedule.getStartInt();
         turnStSchedule.setStartInt(turnStSchedule.getEndInt());
-        turnStSchedule.setEndInt(turnStSchedule.getStartInt());
+        turnStSchedule.setEndInt(temp);
     }
 
 }

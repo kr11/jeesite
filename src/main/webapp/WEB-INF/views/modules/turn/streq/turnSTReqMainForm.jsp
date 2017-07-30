@@ -95,7 +95,7 @@
 		<div class="control-group">
 			<label class="control-label">时间单位：</label>
 			<div class="controls">
-				<form:select path="timgUnit" class="input-xlarge required">
+				<form:select path="timeUnit" class="input-xlarge required">
 					<form:option value="" label=""/>
 					<form:options items="${fns:getDictList('req_time_unit')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 				</form:select>

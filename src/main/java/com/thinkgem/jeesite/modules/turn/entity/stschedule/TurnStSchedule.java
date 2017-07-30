@@ -36,10 +36,21 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     private String timeUnit;
     private String timeUnitSysTemName;
 
-    private int tablePageSize=-1;//table中，单页的大小
-    private int tableStart=-1;//table中，从哪里开始
+    private int tablePageSize = -1;//table中，单页的大小
+    private int tableStart = -1;//table中，从哪里开始
+
+
+    private String isShowCorrect = "1";//是否显示已经匹配的
     //table相关的配置
 //    private int tableStartInt;
+
+    public String getIsShowCorrect() {
+        return isShowCorrect;
+    }
+
+    public void setIsShowCorrect(String isShowCorrect) {
+        this.isShowCorrect = isShowCorrect;
+    }
 
     public TurnStSchedule(TurnStSchedule turnStSchedule) {
         super(turnStSchedule.getId());
@@ -59,6 +70,7 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
         this.startMonthUpOrDown = turnStSchedule.startMonthUpOrDown;
         this.endMonthUpOrDown = turnStSchedule.endMonthUpOrDown;
         this.timeUnit = turnStSchedule.timeUnit;
+        this.delFlag = turnStSchedule.delFlag;
     }
 
     public String getId() {

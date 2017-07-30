@@ -53,8 +53,7 @@ public class TurnStScheduleController extends BaseController {
 
     @RequiresPermissions("turn:stschedule:turnStSchedule:view")
     @RequestMapping(value = {"list", ""})
-    public String list(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response, Model
-            model) {
+    public String list(TurnStSchedule turnStSchedule, Model model) {
 //		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response),
 // turnStSchedule);
         List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
@@ -65,9 +64,9 @@ public class TurnStScheduleController extends BaseController {
     @RequiresPermissions("turn:stschedule:turnStSchedule:view")
     @RequestMapping(value = "form")
     public String form(TurnStSchedule turnStSchedule, Model model) {
-        if(StringUtils.isBlank(turnStSchedule.getTimeUnit()))
+        if (StringUtils.isBlank(turnStSchedule.getTimeUnit()))
             throw new UnsupportedOperationException("timeunit can never be null");
-        if(StringUtils.isBlank(turnStSchedule.getTimeUnit())){
+        if (StringUtils.isBlank(turnStSchedule.getTimeUnit())) {
             turnStSchedule.setTimeUnit(turnStSchedule.getTimeUnit());
         }
         model.addAttribute("turnStSchedule", turnStSchedule);
@@ -76,7 +75,7 @@ public class TurnStScheduleController extends BaseController {
 
     @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
     @RequestMapping(value = "save")
-    public String save(TurnStSchedule turnStSchedule, Model model, RedirectAttributes redirectAttributes) {
+    public String save(TurnStSchedule turnStSchedule, Model model) {
         //在验证最终写入的数据之前，先转化起止时间，然后验证，然后save的时候去更改自己人的其他东西
         String ret = turnStScheduleService.convertStartAndEndTime(model, turnStSchedule);
         if (ret != null) {
@@ -87,16 +86,23 @@ public class TurnStScheduleController extends BaseController {
             return form(turnStSchedule, model);
         }
         turnStScheduleService.save(turnStSchedule);
-        addMessage(redirectAttributes, "保存排班-规培调度表成功");
-        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+        addMessage(model, "保存排班-规培调度表成功");
+//        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+        //刷新turnStSchedule，用户、科室、起止时间都去掉，只剩下timeUnit和archiveId
+        TurnStSchedule newTurn = new TurnStSchedule();
+        newTurn.setTimeUnit(turnStSchedule.getTimeUnit());
+        return list(newTurn, model);
     }
 
     @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
     @RequestMapping(value = "delete")
-    public String delete(TurnStSchedule turnStSchedule, RedirectAttributes redirectAttributes) {
+    public String delete(TurnStSchedule turnStSchedule, Model model) {
         turnStScheduleService.delete(turnStSchedule);
-        addMessage(redirectAttributes, "删除排班-规培调度表成功");
-        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+        addMessage(model, "删除排班-规培调度表成功");
+//        return "redirect:" + Global.getAdminPath() + "/turn/stschedule/turnStSchedule/?repage";
+        TurnStSchedule newTurn = new TurnStSchedule();
+        newTurn.setTimeUnit(turnStSchedule.getTimeUnit());
+        return list(newTurn, model);
     }
 
     /**
@@ -114,6 +120,12 @@ public class TurnStScheduleController extends BaseController {
                             Model model) {
         TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
         model.addAttribute("editTableList", editTableList);
+        //老的已经没有作用了，用一个新的代替，避免什么参数被影响到
+        TurnStSchedule turn = new TurnStSchedule();
+        turn.setTimeUnit(turnStSchedule.getTimeUnit());
+        turn.setTablePageSize(turnStSchedule.getTablePageSize());
+        turn.setTableStart(turnStSchedule.getTableStart());
+        model.addAttribute("turnStSchedule", turn);
         return "modules/turn/stschedule/turnStScheduleTable";
     }
 

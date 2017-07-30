@@ -452,7 +452,7 @@
 			<char_semantics>false</char_semantics>
 			<description></description>
 			<logical_name>时间单位</logical_name>
-			<physical_name>timg_unit</physical_name>
+			<physical_name>time_unit</physical_name>
 			<type>varchar(n)</type>
 		</word>
 		<word>

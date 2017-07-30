@@ -32,10 +32,10 @@
     <li class="active">
         <a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit?timeUnit=${turnStSchedule.timeUnit}">${turnStSchedule.timeUnitSysTemName}-排班</a>
     </li>
-    <li ><a href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
+    <li><a href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
     <%--<shiro:hasPermission name="turn:stschedule:turnStSchedule:edit"><li><a href="${ctx}/turn/stschedule/turnStSchedule/form">排班-规培调度表添加</a></li></shiro:hasPermission>--%>
 </ul>
-<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/list"
+<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/tableEdit"
            method="post" class="breadcrumb form-search">
     <%--<input id="pageNo" name="pageNo" type="hidden" value="${turnStSchedule.tablePageSize}"/>--%>
     <%--<input id="tablePageSize" name="tablePageSize" type="hidden" value="${turnStSchedule.tablePageSize}"/>--%>
@@ -92,12 +92,14 @@
     <c:forEach items="${editTableList.lineList}" var="line">
         <tr>
             <td>
-                    ${line.lineHeader}
+                    ${line.lineHeader[1]}
             </td>
             <c:forEach items="${line.cellList}" var="cell">
                 <td
-                        <c:if test="${cell.toString != ''}">
-                            onclick="goToOneDayEdit()"
+                        <c:if test="${cell != ''}">
+                            onclick="
+                            goToOneDayEdit(${cell.cellHeaderList[0]},'${line.lineHeader[0]}')
+                            "
                         </c:if>
                 >${cell}</td>
             </c:forEach>
@@ -107,9 +109,11 @@
 </table>
 <div class="pagination">
     <ul>
-        <li><a href="javascript:" onclick="switchPage(${turnStSchedule.tableStart-1},${turnStSchedule.tablePageSize});">«
+        <li><a href="javascript:"
+               onclick="switchPage(${turnStSchedule.tableStart-turnStSchedule.tablePageSize},${turnStSchedule.tablePageSize});">«
             上一页</a></li>
-        <li><a href="javascript:" onclick="switchPage(${turnStSchedule.tableStart+1},${turnStSchedule.tablePageSize});">下一页
+        <li><a href="javascript:"
+               onclick="switchPage(${turnStSchedule.tableStart+turnStSchedule.tablePageSize},${turnStSchedule.tablePageSize});">下一页
             »</a></li>
     </ul>
     <div style="clear:both;"></div>

@@ -19,10 +19,11 @@
 </head>
 <body>
 <ul class="nav nav-tabs">
-    <li >
+    <li>
         <a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit?timeUnit=${turnStSchedule.timeUnit}">${turnStSchedule.timeUnitSysTemName}-排班</a>
     </li>
-    <li class="active"><a href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
+    <li class="active"><a
+            href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
 </ul>
 <form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/" method="post"
            class="breadcrumb form-search">
@@ -41,11 +42,16 @@
                 <form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
             </form:select>
         </li>
-        <li><label>开始时间半月整数：</label>
-            <form:input path="startInt" htmlEscape="false" maxlength="64" class="input-medium"/>
-        </li>
-        <li><label>结束时间半月整数：</label>
-            <form:input path="endInt" htmlEscape="false" maxlength="64" class="input-medium"/>
+        <%--<li><label>开始时间半月整数：</label>--%>
+            <%--<form:input path="startInt" htmlEscape="false" maxlength="64" class="input-medium"/>--%>
+        <%--</li>--%>
+        <%--<li><label>结束时间半月整数：</label>--%>
+            <%--<form:input path="endInt" htmlEscape="false" maxlength="64" class="input-medium"/>--%>
+        <%--</li>--%>
+        <li><label>显示已对：</label>
+            <form:select path="isShowCorrect" class="input-medium">
+                <form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+            </form:select>
         </li>
         <li class="btns"><input id="btnSubmit2" class="btn btn-primary" type="submit" value="查询"/></li>
         <li class="clearfix"></li>
@@ -72,7 +78,7 @@
                     <%--<a href="${ctx}/turn/stschedule/turnStSchedule/form?id=${turnStSchedule.id}">--%>
                     <%--${turnStSchedule.userName}--%>
                     <%--</a>--%>
-                <a onclick="$(searchForm${turnStSchedule.user}${turnStSchedule.depId}).submit()">${turnStSchedule.userName}</a>
+                <a onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">${turnStSchedule.userName}</a>
                 <form:form id="searchForm${turnStSchedule.user}${turnStSchedule.depId}"
                            modelAttribute="turnStSchedule"
                            action="${ctx}/turn/stschedule/turnStSchedule/form" style="display:none" method="post">
@@ -90,7 +96,8 @@
                     <input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>
                     <%--<input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>--%>
                     <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
-                    <input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>
+                    <input id="reqStartYAndM" name="reqStartYAndM" type="hidden"
+                           value="${turnStSchedule.reqStartYAndM}"/>
                     <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
                     <input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"
                            value="${turnStSchedule.startMonthUpOrDown}"/>
@@ -115,9 +122,9 @@
             </td>
             <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
                 <td>
-                    <a href="${ctx}/turn/stschedule/turnStSchedule/form?id=${turnStSchedule.id}">修改</a>
+                    <%--<a href="" onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">修改</a>--%>
                     <a href="${ctx}/turn/stschedule/turnStSchedule/delete?id=${turnStSchedule.id}"
-                       onclick="return confirmx('确认要删除该排班-规培调度表吗？', this.href)">删除</a>
+                       onclick="return confirmx('确认要删除该记录吗？', this.href)">删除</a>
                 </td>
             </shiro:hasPermission>
         </tr>
