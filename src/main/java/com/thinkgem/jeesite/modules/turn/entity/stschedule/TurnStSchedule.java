@@ -41,6 +41,7 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
 
 
     private String isShowCorrect = "1";//是否显示已经匹配的
+
     //table相关的配置
 //    private int tableStartInt;
 

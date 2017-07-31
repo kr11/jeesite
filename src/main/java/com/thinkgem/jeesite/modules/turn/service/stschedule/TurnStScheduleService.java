@@ -7,6 +7,7 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.sys.dao.DictDao;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
@@ -51,6 +52,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
 
     @Autowired
     private TurnArchiveDao turnArchiveDao;
+
+    @Autowired
+    private DictDao dictDao;
+
 
     public TurnStSchedule get(String id) {
         return super.get(id);
@@ -404,6 +409,29 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         String temp = turnStSchedule.getStartInt();
         turnStSchedule.setStartInt(turnStSchedule.getEndInt());
         turnStSchedule.setEndInt(temp);
+    }
+
+    public String createAutoArrange(TurnStSchedule turnStSchedule) {
+        //获取timeUnit，archive下所有的标准
+        //删除所有已有的排班
+        TurnStSchedule deleteT = new TurnStSchedule();
+        deleteT.setArchiveId(turnStSchedule.getArchiveId());
+        deleteT.setTimeUnit(turnStSchedule.getTimeUnit());
+        List<TurnStSchedule> scheList = findList(deleteT);
+        scheList.forEach(this::delete);
+        //重新排班
+        List<TurnSTReqMain> stReqList = getReqMap(turnStSchedule);
+        Map<String, List<TurnSTReqUserChild>> reqUserMap = new HashMap<>();
+        Map<String, List<TurnSTReqDepChild>> reqDepMap = new HashMap<>();
+        for (TurnSTReqMain turnSTReqMain : stReqList) {
+            //每一个标准的所有人和科室
+            List<TurnSTReqUserChild> reqUserList = getReqUserList(turnSTReqMain.getId());
+            List<TurnSTReqDepChild> reqDepList = getReqDepList(turnSTReqMain.getId(), turnStSchedule);
+            reqUserMap.put(turnSTReqMain.getId(), reqUserList);
+            reqDepMap.put(turnSTReqMain.getId(), reqDepList);
+        }
+        AutoStArrange range = new AutoStArrange(turnStSchedule, stReqList, reqUserMap, reqDepMap, dao);
+        return range.autoArrange();
     }
 
 }

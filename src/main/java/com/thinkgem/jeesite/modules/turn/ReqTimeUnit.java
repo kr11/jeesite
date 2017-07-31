@@ -172,7 +172,7 @@ public enum ReqTimeUnit {
     }
 
     public static int upOrDown_convertTo_oneZero(String i) {
-        return "上半月".equals(i) ? 0 : 1;
+        return (i == null || "上半月".equals(i)) ? 0 : 1;
     }
 
     public String getTurnSysName() {
