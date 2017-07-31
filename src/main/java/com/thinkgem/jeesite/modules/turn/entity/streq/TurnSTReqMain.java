@@ -29,6 +29,16 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
     private String timeUnit;        // 时间单位
     private List<TurnSTReqDepChild> turnSTReqDepChildList = Lists.newArrayList();        // 子表列表
     private List<TurnSTReqUserChild> turnSTReqUserChildList = Lists.newArrayList();        // 子表列表
+    private String reqBase;        // 标准所属基地
+
+    @Length(min = 0, max = 64, message = "标准所属基地长度必须介于 0 和 64 之间")
+    public String getReqBase() {
+        return reqBase;
+    }
+
+    public void setReqBase(String reqBase) {
+        this.reqBase = reqBase;
+    }
 
     public TurnSTReqMain() {
         super();

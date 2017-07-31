@@ -15,7 +15,8 @@
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
 		a.remarks AS "remarks",
-		a.del_flag AS "delFlag"
+		a.del_flag AS "delFlag",
+		a.req_base AS "reqBase"
 	</sql>
 	
 	<sql id="turnSTReqMainJoins">
@@ -44,6 +45,9 @@
 			</if>
 			<if test="timeUnit != null and timeUnit != ''">
 				AND a.time_unit = #{timeUnit}
+			</if>
+			<if test="reqBase != null and reqBase != ''">
+				AND a.req_base = #{reqBase}
 			</if>
 		</where>
 		<choose>
@@ -88,7 +92,8 @@
 			update_by,
 			update_date,
 			remarks,
-			del_flag
+			del_flag,
+			req_base
 		) VALUES (
 			#{id},
 			#{name},
@@ -102,7 +107,8 @@
 			#{updateBy.id},
 			#{updateDate},
 			#{remarks},
-			#{delFlag}
+			#{delFlag},
+			#{reqBase}
 		)
 	</insert>
 	
@@ -115,7 +121,8 @@
 			time_unit = #{timeUnit},
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
-			remarks = #{remarks}
+			remarks = #{remarks},
+			req_base = #{reqBase}
 		WHERE id = #{id}
 	</update>
 	

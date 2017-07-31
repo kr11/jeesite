@@ -31,6 +31,12 @@
 			<li><label>总时长：</label>
 				<form:input path="totalLength" htmlEscape="false" maxlength="64" class="input-medium"/>
 			</li>
+			<li><label>所属基地：</label>
+				<form:select path="reqBase" class="input-medium">
+					<form:option value="" label=""/>
+					<form:options items="${fns:getDictList('dep_base')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="查询"/></li>
 			<li class="clearfix"></li>
 		</ul>
@@ -40,6 +46,7 @@
 		<thead>
 			<tr>
 				<th>规培标准名</th>
+				<th>标准所属基地</th>
 				<th>开始时间</th>
 				<th>结束时间</th>
 				<th>总时长</th>
@@ -54,6 +61,9 @@
 				<td><a href="${ctx}/turn/streq/turnSTReqMain/form?id=${turnSTReqMain.id}">
 					${turnSTReqMain.name}
 				</a></td>
+				<td>
+						${fns:getDictLabel(turnSTReqMain.reqBase, 'dep_base', '')}
+				</td>
 				<td>
 					${turnSTReqMain.startYAtM}
 				</td>
