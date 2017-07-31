@@ -25,10 +25,32 @@
     <li class="active"><a
             href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
 </ul>
-<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/" method="post"
+<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/list" method="post"
            class="breadcrumb form-search">
     <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
     <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+    <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
+    <input id="archiveId" name="archiveId" type="hidden" value="${turnStSchedule.archiveId}"/>
+    <input id="depId" name="depId" type="hidden" value="${turnStSchedule.depId}"/>
+    <input id="depName" name="depName" type="hidden" value="${turnStSchedule.depName}"/>
+    <input id="user" name="user" type="hidden" value="${turnStSchedule.user}"/>
+    <input id="userName" name="userName" type="hidden" value="${turnStSchedule.userName}"/>
+    <input id="requirementId" name="requirementId" type="hidden"
+           value="${turnStSchedule.requirementId}"/>
+    <input id="startInt" name="startInt" type="hidden" value="${turnStSchedule.startInt}"/>
+    <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
+    <input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>
+    <input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>
+    <%--<input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>--%>
+    <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
+    <input id="reqStartYAndM" name="reqStartYAndM" type="hidden"
+           value="${turnStSchedule.reqStartYAndM}"/>
+    <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
+    <input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"
+           value="${turnStSchedule.startMonthUpOrDown}"/>
+    <input id="endMonthUpOrDown" name="endMonthUpOrDown" type="hidden"
+           value="${turnStSchedule.endMonthUpOrDown}"/>
+
     <ul class="ul-form">
         <li><label>用户名：</label>
             <form:select path="userName" class="input-medium">
@@ -66,6 +88,7 @@
         <th>现开始时间</th>
         <th>现结束时间</th>
         <th>规定时长</th>
+        <th>是否已对</th>
         <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
             <th>操作</th>
         </shiro:hasPermission>
@@ -119,6 +142,9 @@
             </td>
             <td>
                     ${turnStSchedule.oughtTimeLength}
+            </td>
+            <td>
+                    ${turnStSchedule.isCorrect}
             </td>
             <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
                 <td>

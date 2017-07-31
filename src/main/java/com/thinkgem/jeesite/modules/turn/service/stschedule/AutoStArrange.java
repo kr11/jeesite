@@ -168,12 +168,12 @@ class AutoStArrange {
         autoUserMap.forEach((k, v) -> {
             {
                 tt.setUser(v.userId);
-                tt.setRequirementId(tt.getRequirementId());
+                tt.setRequirementId(userIdToReqIdMap.get(v.userId));
                 for (RangeUnit rangeUnit : v.usedBlock) {
                     tt.setId("");
-                    tt.setUserName("deprecated_user_"+random.nextInt());
+                    tt.setUserName("deprecated_user_" + random.nextInt());
                     tt.setDepId(rangeUnit.depId);
-                    tt.setDepName("deprecated_dep_"+random.nextInt());
+                    tt.setDepName("deprecated_dep_" + random.nextInt());
                     tt.setStartInt(rangeUnit.startInt);
                     tt.setEndInt(rangeUnit.startInt + rangeUnit.rangeLength);
                     service.save(tt);
@@ -265,7 +265,8 @@ class AutoStArrange {
          */
         protected int chooseRuleForEqualCandidate(List<Integer> list) {
             assert !list.isEmpty();
-            return list.get(random.nextInt(list.size()));
+//            return list.get(random.nextInt(list.size()));
+            return list.get(0);
         }
 
         /**

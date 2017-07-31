@@ -12,11 +12,13 @@ import com.thinkgem.jeesite.modules.keymap.entity.KeyMap;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
+import com.thinkgem.jeesite.modules.turn.dao.department.TurnDepartmentDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqDepChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.stschedule.TurnStScheduleDao;
 import com.thinkgem.jeesite.modules.turn.entity.archive.TurnArchive;
+import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
@@ -43,8 +45,8 @@ import java.util.Map;
 @Service
 @Transactional(readOnly = false)
 public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnStSchedule> {
-//    @Autowired
-//    private TurnStScheduleDao turnStScheduleDao;
+    @Autowired
+    private TurnDepartmentDao turnDepartmentDao;
 
     @Autowired
     private TurnSTReqDepChildDao depChildDao;
@@ -214,7 +216,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                     String oughtLength = dep.getTimeLength() + " 个 " + ReqTimeUnit.getName(timeUnit);
                     if (!scheMap.containsKey(userId) || !scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
-                        diffRet.add(diffRequirement(turnSTReqMain, user, dep, null, oughtLength));
+                        diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, null, oughtLength));
                     } else {
                         //包含要求的科室，则判断长短
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
@@ -224,7 +226,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                         if ("1".equals(turnStSchedule.getIsShowCorrect()) || Integer.parseInt(dep.getTimeLength()) !=
                                 actualLen) {
                             //长度不同，标记
-                            diffRet.add(diffRequirement(turnSTReqMain, user, dep, userDepSche, oughtLength));
+                            boolean isValid = Integer.parseInt(dep.getTimeLength()) == actualLen;
+                            diffRet.add(diffRequirement(isValid, turnSTReqMain, user, dep, userDepSche, oughtLength));
                         }
                     }
                 }
@@ -234,13 +237,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     }
 
     private TurnStSchedule diffRequirement(
-            TurnSTReqMain turnSTReqMain,
+            boolean isValid, TurnSTReqMain turnSTReqMain,
             TurnSTReqUserChild turnSTReqUserChild,
             TurnSTReqDepChild turnSTReqDepChild, TurnStSchedule userDepSche,
             String oughtLength) {
         TurnStSchedule ret = (userDepSche == null) ?
                 new TurnStSchedule() : new TurnStSchedule(userDepSche.getId());
         ret.setArchiveId(turnSTReqMain.getArchiveId());
+        ret.setBooleanIsCorrect(isValid);
         ret.setDepId(turnSTReqDepChild.getDepartmentId());
         ret.setDepName(turnSTReqDepChild.getDepartmentName().split("@")[1]);
         ret.setUser(turnSTReqUserChild.getId());
@@ -345,16 +349,28 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         //开始时间结束时间的查询条件设置：
         setIntersect(turnStSchedule);
         List<TurnStSchedule> scheList = findList(turnStSchedule);
+        //获取科室的depId->depName
+        Map<String, String> depIdToNameMap = getDepIdToNameMap(turnStSchedule);
         //获取人的id->name
         TurnSTReqUserChild depChild = new TurnSTReqUserChild();
         List<TurnSTReqUserChild> userList = userChildDao.findList(depChild);
         Map<String, String> userIdNameMap = new HashMap<>();
         userList.forEach(u -> userIdNameMap.put(u.getId(), u.getUserName()));
-        TurnStTable tableList = constructEditTable(turnStSchedule, scheList, userIdNameMap);
+        TurnStTable tableList = constructEditTable(turnStSchedule, depIdToNameMap, scheList, userIdNameMap);
         return tableList;
     }
 
-    private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, List<TurnStSchedule> scheList, Map<String,
+    private Map<String, String> getDepIdToNameMap(TurnStSchedule turnStSchedule) {
+        TurnDepartment turnDepartment = new TurnDepartment();
+        turnDepartment.setBelongArchiveId(getOpenArchiveId());
+        List<TurnDepartment> list = turnDepartmentDao.findList(turnDepartment);
+        Map<String, String> ret = new HashMap<>();
+        list.forEach(l -> ret.put(l.getId(), l.getDepartmentName()));
+        return ret;
+    }
+
+    private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, Map<String, String> depIdToNameMap,
+                                           List<TurnStSchedule> scheList, Map<String,
             String> userIdNameMap) {
         TurnStTable retTable = new TurnStTable();
         int startInt = turnStSchedule.getTableStart();
@@ -377,7 +393,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                 line = new StTableLine();
                 //line header:0：depId，1：depName
                 line.addLineHeader(depId);
-                line.addLineHeader(stSchedule.getDepName());
+                line.addLineHeader(depIdToNameMap.get(depId));
                 for (int i = 0; i < tableSize; i++) {
                     line.addCell(new StTableCell());
                 }
