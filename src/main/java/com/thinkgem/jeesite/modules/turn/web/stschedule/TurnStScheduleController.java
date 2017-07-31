@@ -6,6 +6,7 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.web.Servlets;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
@@ -128,6 +129,8 @@ public class TurnStScheduleController extends BaseController {
         turn.setTablePageSize(turnStSchedule.getTablePageSize());
         turn.setTableStart(turnStSchedule.getTableStart());
         model.addAttribute("turnStSchedule", turn);
+//        long seed = turnStScheduleService.getSeed(request, turnStSchedule);
+//        System.out.println(seed);
         return "modules/turn/stschedule/turnStScheduleTable";
     }
 
@@ -135,16 +138,16 @@ public class TurnStScheduleController extends BaseController {
     @RequestMapping(value = {"autoArrange"})
     public String autoArrange(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
                               Model model) {
-        
-        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
-        model.addAttribute("editTableList", editTableList);
-        //老的已经没有作用了，用一个新的代替，避免什么参数被影响到
-        TurnStSchedule turn = new TurnStSchedule();
-        turn.setTimeUnit(turnStSchedule.getTimeUnit());
-        turn.setTablePageSize(turnStSchedule.getTablePageSize());
-        turn.setTableStart(turnStSchedule.getTableStart());
-        model.addAttribute("turnStSchedule", turn);
-        return "modules/turn/stschedule/turnStScheduleTable";
+        long seed = turnStScheduleService.getSeed(request, turnStSchedule);
+        turnStScheduleService.createAutoArrange(seed, turnStSchedule);
+        if (seed < 0) {
+            addMessage(model, "重新排班成功！");
+            seed = -seed;
+        } else {
+            addMessage(model, "重置排班成功！");
+        }
+        model.addAttribute("randomSeed", Long.valueOf(Long.valueOf(seed).toString()));
+        return tableEdit(turnStSchedule, request, response, model);
     }
 
 }

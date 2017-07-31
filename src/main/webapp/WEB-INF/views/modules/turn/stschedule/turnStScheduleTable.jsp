@@ -74,6 +74,16 @@
         <li class="clearfix"></li>
     </ul>
 </form:form>
+<button class="btn btn-primary" onclick="{ if(confirm('确定重置排到上一次生成结果？'))location.href=
+            '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed='}"
+>重置排班</button>
+<button class="btn btn-primary" onclick="{ if(confirm('确定重新排班？'))location.href=
+        '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed=-1'}"
+>重新排班</button>
+<%--<li><label>生成表单：</label>--%>
+    <%--<input id="randomSeed" name="randomSeed" value="${randomSeed}"--%>
+           <%--maxlength="64" class="input-medium"/>--%>
+<%--</li>--%>
 <sys:message content="${message}"/>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">
     <thead>

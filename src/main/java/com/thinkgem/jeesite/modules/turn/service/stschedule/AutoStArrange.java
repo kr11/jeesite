@@ -1,13 +1,13 @@
 package com.thinkgem.jeesite.modules.turn.service.stschedule;
 
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
-import com.thinkgem.jeesite.modules.turn.dao.stschedule.TurnStScheduleDao;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 
 import java.util.*;
+
 
 /**
  * 规培的智能排班系统
@@ -18,20 +18,22 @@ class AutoStArrange {
     private final List<TurnSTReqMain> stReqList;
     private final Map<String, List<TurnSTReqUserChild>> reqUserMap;
     private final Map<String, List<TurnSTReqDepChild>> reqDepMap;
-    private final TurnStScheduleDao dao;
+    private final TurnStScheduleService service;
     private final String timeUnit;
     private Random random;
+
+    private Map<String, String> userIdToReqIdMap = new HashMap<>();
 
     AutoStArrange(TurnStSchedule turnStSchedule, List<TurnSTReqMain> stReqList,
                   Map<String, List<TurnSTReqUserChild>> reqUserMap,
                   Map<String, List<TurnSTReqDepChild>> reqDepMap,
-                  TurnStScheduleDao dao) {
+                  TurnStScheduleService service) {
         this.turnStSchedule = turnStSchedule;
         this.timeUnit = turnStSchedule.getTimeUnit();
         this.stReqList = stReqList;
         this.reqUserMap = reqUserMap;
         this.reqDepMap = reqDepMap;
-        this.dao = dao;
+        this.service = service;
     }
 
     private Map<String, List<TriPair<String, Integer, Float>>> userMap() {
@@ -44,7 +46,7 @@ class AutoStArrange {
             List<TurnSTReqDepChild> reqDepList = reqDepMap.get(turnSTReqMain.getId());
             int reqLen = turnSTReqMain.getTotalLength();
             for (TurnSTReqDepChild dep : reqDepList) {
-                String depId = dep.getId();
+                String depId = dep.getDepartmentId();
                 if (!userArrangeMap.containsKey(depId)) {
                     userArrangeMap.put(depId, new ArrayList<>());
                 }
@@ -53,6 +55,7 @@ class AutoStArrange {
                 for (TurnSTReqUserChild user : reqUserList) {
                     String userId = user.getId();
                     depUserList.add(new TriPair<>(userId, len, ((float) len) / reqLen));
+                    userIdToReqIdMap.put(userId, turnSTReqMain.getId());
                 }
             }
         }
@@ -155,24 +158,30 @@ class AutoStArrange {
         String archiveId = turnStSchedule.getArchiveId();
         deleteT.setArchiveId(archiveId);
         deleteT.setTimeUnit(turnStSchedule.getTimeUnit());
-        List<TurnStSchedule> scheList = dao.findList(deleteT);
-        scheList.forEach(dao::delete);
+        List<TurnStSchedule> scheList = service.findList(deleteT);
+        scheList.forEach(service::delete);
         //插入所有排班
         TurnStSchedule tt = new TurnStSchedule();
         tt.setArchiveId(archiveId);
         tt.setTimeUnit(timeUnit);
         tt.setDelFlag("0");
         autoUserMap.forEach((k, v) -> {
-            tt.setUser(v.userId);
-            for (RangeUnit rangeUnit : v.usedBlock) {
-                tt.setId("");
-                tt.setDepId(rangeUnit.depId);
-                tt.setStartInt(rangeUnit.startInt);
-                tt.setEndInt(rangeUnit.startInt + rangeUnit.rangeLength);
-                dao.insert(tt);
+            {
+                tt.setUser(v.userId);
+                tt.setRequirementId(tt.getRequirementId());
+                for (RangeUnit rangeUnit : v.usedBlock) {
+                    tt.setId("");
+                    tt.setUserName("deprecated_user_"+random.nextInt());
+                    tt.setDepId(rangeUnit.depId);
+                    tt.setDepName("deprecated_dep_"+random.nextInt());
+                    tt.setStartInt(rangeUnit.startInt);
+                    tt.setEndInt(rangeUnit.startInt + rangeUnit.rangeLength);
+                    service.save(tt);
+                }
             }
         });
     }
+
 
     private class AutoUser {
         public String userId;
@@ -285,7 +294,7 @@ class AutoStArrange {
             if (requiredLen > totalLength)
                 throw new RuntimeException("要求的空间大于已有的空间！出错了！");
             List<RangeUnit> newUsedBlock = new ArrayList<>();
-            int lastStart = 0;
+            int lastStart = startInt;
             for (RangeUnit ru : usedBlock) {
                 RangeUnit n = new RangeUnit(ru.depId, lastStart, ru.rangeLength);
                 newUsedBlock.add(n);
@@ -314,17 +323,19 @@ class AutoStArrange {
                             usedBlock.get(i).startInt, requiredLen, candidate);
                 }
                 //最后的
-                addRange(usedBlock.get(i).startInt, startInt + totalLength, requiredLen, candidate);
+                addRange(usedBlock.get(i - 1).startInt + usedBlock.get(i - 1).rangeLength,
+                        startInt + totalLength, requiredLen, candidate);
             }
             return candidate;
         }
     }
 
+
     private void addRange(int start, int end, int requiredLen, List<Integer> candidate) {
         if (end - start < requiredLen)
             return;
-        for (int i = start; i < end - start - requiredLen; i++) {
-            candidate.add(i);
+        for (int i = 0; i <= end - start - requiredLen; i++) {
+            candidate.add(start + i);
         }
     }
 

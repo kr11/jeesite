@@ -7,7 +7,8 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
-import com.thinkgem.jeesite.modules.sys.dao.DictDao;
+import com.thinkgem.jeesite.modules.keymap.dao.KeyMapDao;
+import com.thinkgem.jeesite.modules.keymap.entity.KeyMap;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
@@ -28,7 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 排班-规培调度表Service
@@ -37,7 +41,7 @@ import java.util.*;
  * @version 2017-07-29
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnStSchedule> {
 //    @Autowired
 //    private TurnStScheduleDao turnStScheduleDao;
@@ -55,8 +59,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private TurnArchiveDao turnArchiveDao;
 
     @Autowired
-    private DictDao dictDao;
-
+    private KeyMapDao keyMapDao;
 
     public TurnStSchedule get(String id) {
         return super.get(id);
@@ -426,24 +429,58 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             reqUserMap.put(turnSTReqMain.getId(), reqUserList);
             reqDepMap.put(turnSTReqMain.getId(), reqDepList);
         }
-        AutoStArrange range = new AutoStArrange(turnStSchedule, stReqList, reqUserMap, reqDepMap, dao);
+        turnStSchedule.setArchiveId(getOpenArchiveId());
+        AutoStArrange range = new AutoStArrange(turnStSchedule, stReqList, reqUserMap, reqDepMap, this);
         return range.autoArrange(seed);
     }
 
     /**
-     * 如果指定了，就按照这个办；如果制定了-1，则重新生成，否则从数据库中找；
+     * 原则：
+     * 输入等于-1或者其他；
+     * 等于-1，重新生成，写入数据库；
+     * 等于其他，去数据库找，没有则重新生成
+     * 有，不存储
+     *
      * @param request
      * @return
      */
-    public long getSeed(HttpServletRequest request) {
-        String seedStr = request.getParameter("seed");
+    public long getSeed(HttpServletRequest request, TurnStSchedule turnStSchedule) {
+        String seedStr = request.getParameter("randomSeed");
+        String key = getOpenArchiveId() + "_" + turnStSchedule.getTimeUnit() + "_seed";
+        KeyMap keyMap = new KeyMap();
+        keyMap.setDictKey(key);
+        List<KeyMap> ret = keyMapDao.findList(keyMap);
         long seed;
-        if(StringUtils.isBlank(seedStr)){
 
+        if (StringUtils.isNotBlank(seedStr) && Long.parseLong(seedStr) == -1) {
+            //-1，重新生成
+            seed = System.nanoTime();
+            if (!ret.isEmpty())
+                keyMap.setId(ret.get(0).getId());
+            keyMap.setDictValue(Long.valueOf(seed).toString());
+            save(keyMap);
+            //取反，告诉外面是重置还是重生
+            seed = -seed;
+        } else if (ret.isEmpty()) {
+            //不是重生，但是原来没有，重新设置一个
+            seed = System.nanoTime();
+            keyMap.setDictValue(Long.valueOf(seed).toString());
+            save(keyMap);
+        } else {
+//            原来已有，直接获取即可
+            seed = Long.parseLong(ret.get(0).getDictValue());
         }
-        seed = Long.parseLong(seedStr);
-        return seed == -1 ? System.nanoTime() : seed;
+        return seed;
     }
 
+    private void save(KeyMap keyMap) {
+        if (keyMap.getIsNewRecord()) {
+            keyMap.preInsert();
+            keyMapDao.insert(keyMap);
+        } else {
+            keyMap.preUpdate();
+            keyMapDao.update(keyMap);
+        }
+    }
 
 }
