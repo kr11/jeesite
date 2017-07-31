@@ -43,6 +43,19 @@ public class TurnStSchedule extends DataEntity<TurnStSchedule> {
     private String isShowCorrect = "1";//是否显示已经匹配的
     private String isCorrect = "";//是否是符合规范的
 
+    public String getIsFromCellClick() {
+        return isFromCellClick;
+    }
+
+    public void setIsFromCellClick(String isFromCellClick) {
+        this.isFromCellClick = isFromCellClick;
+    }
+
+    /**
+     * //是否是从表格点击的，1为是，""为不是
+     */
+    private String isFromCellClick = "";
+
     public String getIsCorrect() {
         return isCorrect;
     }

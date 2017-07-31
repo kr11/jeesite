@@ -10,6 +10,7 @@ import com.thinkgem.jeesite.common.web.Servlets;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
+import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,10 @@ public class TurnStScheduleController extends BaseController {
 //		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response),
 // turnStSchedule);
         List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
+        List<TurnDepartment> depList = turnStScheduleService
+                .getDepartmentList();
         model.addAttribute("diffList", diffList);
+        model.addAttribute("departmentList", depList);
         return "modules/turn/stschedule/turnStScheduleList";
     }
 

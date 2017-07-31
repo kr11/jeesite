@@ -144,8 +144,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private Map<String, Map<String, TurnStSchedule>> getUserToScheList(
             TurnStSchedule turnStSchedule) {
         turnStSchedule.setArchiveId(getOpenArchiveId());
-        setIntersect(turnStSchedule);
-        final List<TurnStSchedule> currentSche = findList(turnStSchedule);
+        turnStSchedule.setUserName("");
+        turnStSchedule.setDepName("");
+        TurnStSchedule temp = setIntersect(turnStSchedule);
+        final List<TurnStSchedule> currentSche = findList(temp);
         //组织成userid->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = new HashMap<>();
         for (final TurnStSchedule stSchedule : currentSche) {
@@ -216,7 +218,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                     String oughtLength = dep.getTimeLength() + " 个 " + ReqTimeUnit.getName(timeUnit);
                     if (!scheMap.containsKey(userId) || !scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
-                        diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, null, oughtLength));
+                        //但是注意，如果日期限制不为空，说明是单个表格点击，这时候只显示相关的列，这样的话不写入不存在的列
+                        if(StringUtils.isBlank(turnStSchedule.getIsFromCellClick()))
+                            diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, null, oughtLength));
                     } else {
                         //包含要求的科室，则判断长短
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
@@ -347,10 +351,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
         turnStSchedule.setArchiveId(getOpenArchiveId());
         //开始时间结束时间的查询条件设置：
-        setIntersect(turnStSchedule);
-        List<TurnStSchedule> scheList = findList(turnStSchedule);
+        TurnStSchedule temp = setIntersect(turnStSchedule);
+        List<TurnStSchedule> scheList = findList(temp);
         //获取科室的depId->depName
-        Map<String, String> depIdToNameMap = getDepIdToNameMap(turnStSchedule);
+        Map<String, String> depIdToNameMap = getDepIdToNameMap();
         //获取人的id->name
         TurnSTReqUserChild depChild = new TurnSTReqUserChild();
         List<TurnSTReqUserChild> userList = userChildDao.findList(depChild);
@@ -360,10 +364,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         return tableList;
     }
 
-    private Map<String, String> getDepIdToNameMap(TurnStSchedule turnStSchedule) {
+    public List<TurnDepartment> getDepartmentList() {
         TurnDepartment turnDepartment = new TurnDepartment();
         turnDepartment.setBelongArchiveId(getOpenArchiveId());
-        List<TurnDepartment> list = turnDepartmentDao.findList(turnDepartment);
+        return turnDepartmentDao.findList(turnDepartment);
+    }
+
+    private Map<String, String> getDepIdToNameMap() {
+        List<TurnDepartment> list = getDepartmentList();
         Map<String, String> ret = new HashMap<>();
         list.forEach(l -> ret.put(l.getId(), l.getDepartmentName()));
         return ret;
@@ -423,12 +431,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      *
      * @param turnStSchedule
      */
-    private void setIntersect(TurnStSchedule turnStSchedule) {
+    private TurnStSchedule setIntersect(TurnStSchedule turnStSchedule) {
         // 对于aSt,aEnd,以及查询条件的s，e,找出与[s,e)相交的部分，条件为s<aEnd and e > aSt
         //sql里的条件是：a.start_int < #{startInt} AND a.end_int > #{endInt}
-        String temp = turnStSchedule.getStartInt();
-        turnStSchedule.setStartInt(turnStSchedule.getEndInt());
-        turnStSchedule.setEndInt(temp);
+        TurnStSchedule turn = new TurnStSchedule(turnStSchedule);
+        String temp = turn.getStartInt();
+        turn.setStartInt(turn.getEndInt());
+        turn.setEndInt(temp);
+        return turn;
     }
 
     @Transactional(readOnly = false)

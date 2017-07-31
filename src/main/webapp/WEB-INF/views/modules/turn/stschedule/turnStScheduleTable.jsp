@@ -61,6 +61,7 @@
             <%--<input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>--%>
             <%--<input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>--%>
         <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
+        <input id="isFromCellClick" name="isFromCellClick" type="hidden" value="1"/>
             <%--<input id="reqStartYAndM" name="reqStartYAndM" type="hidden" value="${turnStSchedule.reqStartYAndM}"/>--%>
             <%--<input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>--%>
             <%--<input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"--%>
@@ -75,14 +76,16 @@
     </ul>
 </form:form>
 <button class="btn btn-primary" onclick="{ if(confirm('确定重置排到上一次生成结果？'))location.href=
-            '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed='}"
->重置排班</button>
+        '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed='}"
+>重置排班
+</button>
 <button class="btn btn-primary" onclick="{ if(confirm('确定重新排班？'))location.href=
         '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed=-1'}"
->重新排班</button>
+>重新排班
+</button>
 <%--<li><label>生成表单：</label>--%>
-    <%--<input id="randomSeed" name="randomSeed" value="${randomSeed}"--%>
-           <%--maxlength="64" class="input-medium"/>--%>
+<%--<input id="randomSeed" name="randomSeed" value="${randomSeed}"--%>
+<%--maxlength="64" class="input-medium"/>--%>
 <%--</li>--%>
 <sys:message content="${message}"/>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">

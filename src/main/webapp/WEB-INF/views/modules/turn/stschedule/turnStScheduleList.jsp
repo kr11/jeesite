@@ -22,63 +22,74 @@
     <li>
         <a href="${ctx}/turn/stschedule/turnStSchedule/tableEdit?timeUnit=${turnStSchedule.timeUnit}">${turnStSchedule.timeUnitSysTemName}-排班</a>
     </li>
-    <li class="active"><a
-            href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a></li>
+    <c:choose>
+        <c:when test="${not empty turnStSchedule.isFromCellClick}">
+            <li class="active"><a>当前单元格记录</a></li>
+            <li><a
+                    href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a>
+            </li>
+        </c:when>
+        <c:otherwise>
+            <li class="active"><a
+                    href="${ctx}/turn/stschedule/turnStSchedule/list?timeUnit=${turnStSchedule.timeUnit}">人员排班记录</a>
+            </li>
+        </c:otherwise>
+    </c:choose>
 </ul>
-<form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/list" method="post"
-           class="breadcrumb form-search">
-    <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
-    <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
-    <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
-    <input id="archiveId" name="archiveId" type="hidden" value="${turnStSchedule.archiveId}"/>
-    <input id="depId" name="depId" type="hidden" value="${turnStSchedule.depId}"/>
-    <input id="depName" name="depName" type="hidden" value="${turnStSchedule.depName}"/>
-    <input id="user" name="user" type="hidden" value="${turnStSchedule.user}"/>
-    <input id="userName" name="userName" type="hidden" value="${turnStSchedule.userName}"/>
-    <input id="requirementId" name="requirementId" type="hidden"
-           value="${turnStSchedule.requirementId}"/>
-    <input id="startInt" name="startInt" type="hidden" value="${turnStSchedule.startInt}"/>
-    <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
-    <input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>
-    <input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>
-    <%--<input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>--%>
-    <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
-    <input id="reqStartYAndM" name="reqStartYAndM" type="hidden"
-           value="${turnStSchedule.reqStartYAndM}"/>
-    <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
-    <input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"
-           value="${turnStSchedule.startMonthUpOrDown}"/>
-    <input id="endMonthUpOrDown" name="endMonthUpOrDown" type="hidden"
-           value="${turnStSchedule.endMonthUpOrDown}"/>
+<c:if test="${empty turnStSchedule.isFromCellClick}">
+    <form:form id="searchForm" modelAttribute="turnStSchedule" action="${ctx}/turn/stschedule/turnStSchedule/list"
+               method="post"
+               class="breadcrumb form-search">
+        <input id="pageNo" name="pageNo" type="hidden" value="${page.pageNo}"/>
+        <input id="pageSize" name="pageSize" type="hidden" value="${page.pageSize}"/>
+        <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
+        <input id="archiveId" name="archiveId" type="hidden" value="${turnStSchedule.archiveId}"/>
+        <input id="depName" name="depName" type="hidden" value="${turnStSchedule.depName}"/>
+        <input id="user" name="user" type="hidden" value="${turnStSchedule.user}"/>
+        <input id="userName" name="userName" type="hidden" value="${turnStSchedule.userName}"/>
+        <input id="requirementId" name="requirementId" type="hidden"
+               value="${turnStSchedule.requirementId}"/>
+        <input id="startInt" name="startInt" type="hidden" value="${turnStSchedule.startInt}"/>
+        <input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>
+        <input id="startYandM" name="startYandM" type="hidden" value="${turnStSchedule.startYandM}"/>
+        <input id="endYandM" name="endYandM" type="hidden" value="${turnStSchedule.endYandM}"/>
+        <%--<input id="endInt" name="endInt" type="hidden" value="${turnStSchedule.endInt}"/>--%>
+        <input id="timeUnit" name="timeUnit" type="hidden" value="${turnStSchedule.timeUnit}"/>
+        <input id="reqStartYAndM" name="reqStartYAndM" type="hidden"
+               value="${turnStSchedule.reqStartYAndM}"/>
+        <input id="reqEndYAndM" name="reqEndYAndM" type="hidden" value="${turnStSchedule.reqEndYAndM}"/>
+        <input id="startMonthUpOrDown" name="startMonthUpOrDown" type="hidden"
+               value="${turnStSchedule.startMonthUpOrDown}"/>
+        <input id="endMonthUpOrDown" name="endMonthUpOrDown" type="hidden"
+               value="${turnStSchedule.endMonthUpOrDown}"/>
 
-    <ul class="ul-form">
-        <li><label>用户名：</label>
-            <form:select path="userName" class="input-medium">
-                <form:option value="" label=""/>
-                <form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-            </form:select>
-        </li>
-        <li><label>科室名：</label>
-            <form:select path="depName" class="input-medium">
-                <form:option value="" label=""/>
-                <form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-            </form:select>
-        </li>
-        <%--<li><label>开始时间半月整数：</label>--%>
-            <%--<form:input path="startInt" htmlEscape="false" maxlength="64" class="input-medium"/>--%>
-        <%--</li>--%>
-        <%--<li><label>结束时间半月整数：</label>--%>
-            <%--<form:input path="endInt" htmlEscape="false" maxlength="64" class="input-medium"/>--%>
-        <%--</li>--%>
-        <li><label>显示已对：</label>
-            <form:select path="isShowCorrect" class="input-medium">
-                <form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
-            </form:select>
-        </li>
-        <li class="btns"><input id="btnSubmit2" class="btn btn-primary" type="submit" value="查询"/></li>
-        <li class="clearfix"></li>
-    </ul>
-</form:form>
+        <ul class="ul-form">
+                <%--<li><label>用户名：</label>--%>
+                <%--<form:select path="userName" class="input-medium">--%>
+                <%--<form:options items="${fns:getDictList('')}" itemLabel="label" itemValue="value" htmlEscape="false"/>--%>
+                <%--</form:select>--%>
+                <%--</li>--%>
+            <li><label>科室名：</label>
+                    <%--<div class="controls">--%>
+                <form:select path="depId" class="input-xlarge">
+                    <form:option value="" label=""/>
+                    <%--<option value=""></option>--%>
+                    <form:options items="${departmentList}" itemLabel="departmentName" itemValue="id"
+                                  htmlEscape="false"/>
+                </form:select>
+                    <%--</div>--%>
+            </li>
+            <li><label>显示已对：</label>
+                <form:select path="isShowCorrect" class="input-medium">
+                    <form:options items="${fns:getDictList('yes_no')}" itemLabel="label" itemValue="value"
+                                  htmlEscape="false"/>
+                </form:select>
+            </li>
+            <li class="btns"><input id="btnSubmit2" class="btn btn-primary" type="submit" value="查询"/></li>
+            <li class="clearfix"></li>
+        </ul>
+    </form:form>
+</c:if>
 <sys:message content="${message}"/>
 <table id="contentTable" class="table table-striped table-bordered table-condensed">
     <thead>
@@ -101,13 +112,13 @@
                     <%--<a href="${ctx}/turn/stschedule/turnStSchedule/form?id=${turnStSchedule.id}">--%>
                     <%--${turnStSchedule.userName}--%>
                     <%--</a>--%>
-                <a onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">${turnStSchedule.userName}</a>
+                <a onclick="$('#searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">${turnStSchedule.userName}</a>
                 <form:form id="searchForm${turnStSchedule.user}${turnStSchedule.depId}"
                            modelAttribute="turnStSchedule"
                            action="${ctx}/turn/stschedule/turnStSchedule/form" style="display:none" method="post">
                     <input id="id" name="id" type="hidden" value="${turnStSchedule.id}"/>
                     <input id="archiveId" name="archiveId" type="hidden" value="${turnStSchedule.archiveId}"/>
-                    <input id="depId" name="depId" type="hidden" value="${turnStSchedule.depId}"/>
+                    <input id="depId2" name="depId" type="hidden" value="${turnStSchedule.depId}"/>
                     <input id="depName" name="depName" type="hidden" value="${turnStSchedule.depName}"/>
                     <input id="user" name="user" type="hidden" value="${turnStSchedule.user}"/>
                     <input id="userName" name="userName" type="hidden" value="${turnStSchedule.userName}"/>
@@ -148,9 +159,11 @@
             </td>
             <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
                 <td>
-                    <a href="" onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">修改</a>
-                    <a href="${ctx}/turn/stschedule/turnStSchedule/delete?id=${turnStSchedule.id}"
+                    <a onclick="$('#searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">修改</a>
+                    <c:if test="${not empty turnStSchedule.id}">
+                    <a href="${ctx}/turn/stschedule/turnStSchedule/delete?id=${turnStSchedule.id}&timeUnit=${turnStSchedule.timeUnit}"
                        onclick="return confirmx('确认要删除该记录吗？', this.href)">删除</a>
+                    </c:if>
                 </td>
             </shiro:hasPermission>
         </tr>
