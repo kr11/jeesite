@@ -12,28 +12,26 @@ import java.util.*;
 /**
  * 规培的智能排班系统
  */
-public class AutoStArrange {
+class AutoStArrange {
 
     private final TurnStSchedule turnStSchedule;
     private final List<TurnSTReqMain> stReqList;
     private final Map<String, List<TurnSTReqUserChild>> reqUserMap;
     private final Map<String, List<TurnSTReqDepChild>> reqDepMap;
     private final TurnStScheduleDao dao;
+    private final String timeUnit;
+    private Random random;
 
-    public AutoStArrange(TurnStSchedule turnStSchedule, List<TurnSTReqMain> stReqList,
-                         Map<String, List<TurnSTReqUserChild>> reqUserMap,
-                         Map<String, List<TurnSTReqDepChild>> reqDepMap,
-                         TurnStScheduleDao dao) {
+    AutoStArrange(TurnStSchedule turnStSchedule, List<TurnSTReqMain> stReqList,
+                  Map<String, List<TurnSTReqUserChild>> reqUserMap,
+                  Map<String, List<TurnSTReqDepChild>> reqDepMap,
+                  TurnStScheduleDao dao) {
         this.turnStSchedule = turnStSchedule;
+        this.timeUnit = turnStSchedule.getTimeUnit();
         this.stReqList = stReqList;
         this.reqUserMap = reqUserMap;
         this.reqDepMap = reqDepMap;
         this.dao = dao;
-    }
-
-
-    public void backup() {
-
     }
 
     private Map<String, List<TriPair<String, Integer, Float>>> userMap() {
@@ -108,7 +106,21 @@ public class AutoStArrange {
      *
      * @return
      */
-    public String autoArrange() {
+    public String autoArrange(long randomSeed) {
+        random = new Random(randomSeed);
+        //获取最早和最晚时间点
+        int earliestInt = Integer.MAX_VALUE;
+        for (TurnSTReqMain p : stReqList) {
+            int start = ReqTimeUnit.convertYYYY_MM_2Int(p.getStartYAtM(), timeUnit, null);
+            if (earliestInt > start)
+                earliestInt = start;
+        }
+        int latestInt = Integer.MAX_VALUE;
+        for (TurnSTReqMain p : stReqList) {
+            int end = ReqTimeUnit.convertYYYY_MM_2Int(p.getEndYAtM(), timeUnit, null);
+            if (latestInt > end)
+                latestInt = end;
+        }
         Map<String, List<TriPair<String, Integer, Float>>> userArrangeMap = userMap();
         // 构建所有人的AutoUser，用以更新:userId->autoUser
         Map<String, AutoUser> autoUserMap = getUserAutoMap();
@@ -117,17 +129,49 @@ public class AutoStArrange {
         //遍历寻找
         for (Pair<String, List<TriPair<String, Integer, Float>>> depUserPair : userArrangeList) {
             String depId = depUserPair.left;
+            //分配一个offsetArray记录当前的排班情况
+            OffsetArray offsetArray = new OffsetArray(earliestInt, latestInt);
             //left:userId, mid: length, right: float(现在没用了)
             List<TriPair<String, Integer, Float>> userIdSortedList = depUserPair.right;
             for (TriPair<String, Integer, Float> triPair : userIdSortedList) {
                 String userId = triPair.left;
                 int depLen = triPair.mid;
                 AutoUser autoUser = autoUserMap.get(userId);
-                autoUser.insert();
+                autoUser.insert(depId, depLen, offsetArray);
             }
-            //排列depId
-
         }
+        insertAll(autoUserMap);
+        return null;
+    }
+
+    /**
+     * 将所有排好的班插入
+     *
+     * @param autoUserMap
+     */
+    private void insertAll(Map<String, AutoUser> autoUserMap) {
+        //删除所有已有的排班
+        TurnStSchedule deleteT = new TurnStSchedule();
+        String archiveId = turnStSchedule.getArchiveId();
+        deleteT.setArchiveId(archiveId);
+        deleteT.setTimeUnit(turnStSchedule.getTimeUnit());
+        List<TurnStSchedule> scheList = dao.findList(deleteT);
+        scheList.forEach(dao::delete);
+        //插入所有排班
+        TurnStSchedule tt = new TurnStSchedule();
+        tt.setArchiveId(archiveId);
+        tt.setTimeUnit(timeUnit);
+        tt.setDelFlag("0");
+        autoUserMap.forEach((k, v) -> {
+            tt.setUser(v.userId);
+            for (RangeUnit rangeUnit : v.usedBlock) {
+                tt.setId("");
+                tt.setDepId(rangeUnit.depId);
+                tt.setStartInt(rangeUnit.startInt);
+                tt.setEndInt(rangeUnit.startInt + rangeUnit.rangeLength);
+                dao.insert(tt);
+            }
+        });
     }
 
     private class AutoUser {
@@ -139,19 +183,202 @@ public class AutoStArrange {
 
         public AutoUser(String userId, int startInt, int totalLength) {
             this.userId = userId;
-            this.usedBlock = new ArrayList<>();
-            this.restBlock = new ArrayList<>();
+            this.usedBlock = new LinkedList<>();
+            this.restBlock = new LinkedList<>();
             this.startInt = startInt;
             this.totalLength = totalLength;
         }
 
-        protected void insert(String depLen, String depId, )
+        /**
+         * 给定信息，插入一个元素，更新自己和depCovered
+         *
+         * @param depId：待插入的科室id
+         * @param depLen：待插入的科室时长
+         * @param depCovered：这个科室的全局占用情况
+         */
+        protected void insert(String depId, int depLen, OffsetArray depCovered) {
+            List<Integer> candidates = makeRoom(depLen);
+            //decided是决定排班的地方，如20121到20122，插入两个月
+            int decided = determineInsert(depLen, candidates, depCovered);
+            //插入到usedBlock中，insertIndex是指插入到usedBlock的index
+            int insertIndex;
+            for (insertIndex = 0; insertIndex < usedBlock.size(); insertIndex++) {
+                int current = usedBlock.get(insertIndex).startInt;
+                if (current == decided)
+                    throw new RuntimeException("why equal?");
+                if (current > decided)
+                    break;
+            }
+            usedBlock.add(insertIndex, new RangeUnit(depId, decided, depLen));
+            //更新depCovered
+            depCovered.addRange(decided, depLen, 1);
+        }
 
+        /**
+         * 给定了可以插入的地方，然后寻找合适的分布
+         * 这里的原则是，选择最低哇的一段，即，从s到s+reqLen，已有的部分值总和最小
+         *
+         * @param depLen
+         * @param candidates
+         * @param depCovered
+         * @return
+         */
+        protected int determineInsert(int depLen, List<Integer> candidates, OffsetArray depCovered) {
+            assert !candidates.isEmpty();
+            int startI = candidates.get(0);
+            //初始化状态
+            int sum = 0;
+            int minSum = Integer.MAX_VALUE;
+            List<Integer> selectedList = new ArrayList<>();
+            for (int i = startI; i < startI + depLen - 1; i++) {
+                sum += depCovered.get(i);
+            }
+            for (int i = startI; i <= candidates.get(candidates.size() - 1); i++) {
+                sum += depCovered.get(i + depLen - 1);
+                if (sum < minSum) {
+                    selectedList.clear();
+                    minSum = sum;
+                    selectedList.add(i);
+                } else if (sum == minSum) {
+                    selectedList.add(i);
+                }
+                sum -= depCovered.get(i);
+            }
+            return chooseRuleForEqualCandidate(selectedList);
+        }
+
+        /**
+         * 对于没有差别的候选集选择哪个？可选
+         * 这里的策略：随机选择
+         *
+         * @param list
+         * @return
+         */
+        protected int chooseRuleForEqualCandidate(List<Integer> list) {
+            assert !list.isEmpty();
+            return list.get(random.nextInt(list.size()));
+        }
+
+        /**
+         * 如果没有空间就腾出来，如果腾不出来就报错
+         *
+         * @param requiredLen
+         * @return
+         */
+        private List<Integer> makeRoom(int requiredLen) {
+            List<Integer> candidate = findRoom(requiredLen);
+            if (candidate.isEmpty()) {
+                //合并空间，全部前推
+                compactRoom(requiredLen);
+                candidate = findRoom(requiredLen);
+            }
+            return candidate;
+        }
+
+        /**
+         * 要腾出一个requiredLen长度的地方，策略自选
+         * 这里的策略是全部往前堆
+         *
+         * @param requiredLen
+         */
+        void compactRoom(int requiredLen) {
+            if (requiredLen > totalLength)
+                throw new RuntimeException("要求的空间大于已有的空间！出错了！");
+            List<RangeUnit> newUsedBlock = new ArrayList<>();
+            int lastStart = 0;
+            for (RangeUnit ru : usedBlock) {
+                RangeUnit n = new RangeUnit(ru.depId, lastStart, ru.rangeLength);
+                newUsedBlock.add(n);
+                lastStart += ru.rangeLength;
+            }
+            this.usedBlock = newUsedBlock;
+        }
+
+        /**
+         * 搜索[startInt, startInt+totalLength)的区间，找可空长度，形成候选列表
+         *
+         * @param requiredLen
+         * @return return null if makes room failed.
+         */
+        private List<Integer> findRoom(int requiredLen) {
+            List<Integer> candidate = new ArrayList<>();
+            if (usedBlock.isEmpty()) {
+                addRange(startInt, startInt + totalLength, requiredLen, candidate);
+            } else {
+                //开始的
+                addRange(startInt, usedBlock.get(0).startInt, requiredLen, candidate);
+                //usedBlock是排好序的
+                int i;
+                for (i = 1; i < usedBlock.size(); i++) {
+                    addRange(usedBlock.get(i - 1).startInt + usedBlock.get(i - 1).rangeLength,
+                            usedBlock.get(i).startInt, requiredLen, candidate);
+                }
+                //最后的
+                addRange(usedBlock.get(i).startInt, startInt + totalLength, requiredLen, candidate);
+            }
+            return candidate;
+        }
+    }
+
+    private void addRange(int start, int end, int requiredLen, List<Integer> candidate) {
+        if (end - start < requiredLen)
+            return;
+        for (int i = start; i < end - start - requiredLen; i++) {
+            candidate.add(i);
+        }
+    }
+
+    /**
+     * 偏移数组，给定开始和终点，然后像正常数组一样处理
+     */
+    public class OffsetArray {
+        private final int earliestInt;
+        private final int latestInt;
+        private final int len;
+        private final int[] data;
+        private int highest;
+
+        public OffsetArray(int earliestInt, int latestInt) {
+            assert earliestInt < latestInt;
+            this.earliestInt = earliestInt;
+            this.latestInt = latestInt;
+            len = latestInt - earliestInt;
+            data = new int[len];
+            highest = 0;
+        }
+
+        public int get(int i) {
+            return data[i - earliestInt];
+        }
+
+        /**
+         * 在一段范围内的所有值增加add
+         *
+         * @param start
+         * @param l
+         * @param add
+         */
+        public void addRange(int start, int l, int add) {
+            assert start >= earliestInt && start + l <= earliestInt + len;
+            for (int i = start; i < start + l; i++) {
+                data[i - earliestInt] += add;
+            }
+        }
     }
 
     private class RangeUnit {
-        public Integer startInt;
-        public Integer rangeLength;
+        String depId;
+        Integer startInt;
+
+        public RangeUnit(String depId, Integer startInt, Integer rangeLength) {
+            this.depId = depId;
+            this.startInt = startInt;
+            this.rangeLength = rangeLength;
+        }
+
+        Integer rangeLength;
+
+
     }
 
     private class Pair<T, V> {

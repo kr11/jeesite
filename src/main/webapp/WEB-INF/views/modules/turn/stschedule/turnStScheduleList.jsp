@@ -122,7 +122,7 @@
             </td>
             <shiro:hasPermission name="turn:stschedule:turnStSchedule:edit">
                 <td>
-                    <%--<a href="" onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">修改</a>--%>
+                    <a href="" onclick="$('searchForm${turnStSchedule.user}${turnStSchedule.depId}').submit()">修改</a>
                     <a href="${ctx}/turn/stschedule/turnStSchedule/delete?id=${turnStSchedule.id}"
                        onclick="return confirmx('确认要删除该记录吗？', this.href)">删除</a>
                 </td>

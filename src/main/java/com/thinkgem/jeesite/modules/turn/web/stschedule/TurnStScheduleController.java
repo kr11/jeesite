@@ -6,6 +6,8 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.modules.sys.entity.Dict;
+import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -118,6 +120,22 @@ public class TurnStScheduleController extends BaseController {
     @RequestMapping(value = {"tableEdit"})
     public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
                             Model model) {
+        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
+        model.addAttribute("editTableList", editTableList);
+        //老的已经没有作用了，用一个新的代替，避免什么参数被影响到
+        TurnStSchedule turn = new TurnStSchedule();
+        turn.setTimeUnit(turnStSchedule.getTimeUnit());
+        turn.setTablePageSize(turnStSchedule.getTablePageSize());
+        turn.setTableStart(turnStSchedule.getTableStart());
+        model.addAttribute("turnStSchedule", turn);
+        return "modules/turn/stschedule/turnStScheduleTable";
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
+    @RequestMapping(value = {"autoArrange"})
+    public String autoArrange(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
+                              Model model) {
+        
         TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
         model.addAttribute("editTableList", editTableList);
         //老的已经没有作用了，用一个新的代替，避免什么参数被影响到

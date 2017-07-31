@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -411,14 +412,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         turnStSchedule.setEndInt(temp);
     }
 
-    public String createAutoArrange(TurnStSchedule turnStSchedule) {
+    @Transactional(readOnly = false)
+    public String createAutoArrange(long seed, TurnStSchedule turnStSchedule) {
         //获取timeUnit，archive下所有的标准
-        //删除所有已有的排班
-        TurnStSchedule deleteT = new TurnStSchedule();
-        deleteT.setArchiveId(turnStSchedule.getArchiveId());
-        deleteT.setTimeUnit(turnStSchedule.getTimeUnit());
-        List<TurnStSchedule> scheList = findList(deleteT);
-        scheList.forEach(this::delete);
         //重新排班
         List<TurnSTReqMain> stReqList = getReqMap(turnStSchedule);
         Map<String, List<TurnSTReqUserChild>> reqUserMap = new HashMap<>();
@@ -431,7 +427,23 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             reqDepMap.put(turnSTReqMain.getId(), reqDepList);
         }
         AutoStArrange range = new AutoStArrange(turnStSchedule, stReqList, reqUserMap, reqDepMap, dao);
-        return range.autoArrange();
+        return range.autoArrange(seed);
     }
+
+    /**
+     * 如果指定了，就按照这个办；如果制定了-1，则重新生成，否则从数据库中找；
+     * @param request
+     * @return
+     */
+    public long getSeed(HttpServletRequest request) {
+        String seedStr = request.getParameter("seed");
+        long seed;
+        if(StringUtils.isBlank(seedStr)){
+
+        }
+        seed = Long.parseLong(seedStr);
+        return seed == -1 ? System.nanoTime() : seed;
+    }
+
 
 }
