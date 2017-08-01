@@ -183,7 +183,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             if(!p.getId().equals(emptyReqId))
                 ret.add(p);
         });
-        return rr;
+        return ret;
     }
 
     /**
@@ -297,8 +297,15 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         main.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         main.setTimeUnit(timeUnit);
         List<TurnSTReqMain> archMain = reqMainDao.findList(main);
+        String start = "";
+        for (TurnSTReqMain turnSTReqMain : archMain) {
+            if (StringUtils.isNotBlank(turnSTReqMain.getStartYAtM())) {
+                start = turnSTReqMain.getStartYAtM();
+                break;
+            }
+        }
         //规培的开始阶段一定是整数，所以halfmonth传一个上半月即可
-        return ReqTimeUnit.convertYYYY_MM_2Int(archMain.get(0).getStartYAtM(), timeUnit, "上半月");
+        return ReqTimeUnit.convertYYYY_MM_2Int(start, timeUnit, "上半月");
 //        TurnConstant.currentStTableStartYAndM = ;
 //        return TurnConstant.currentStTableStartYAndM;
     }

@@ -48,7 +48,7 @@ class AutoStArrange {
             for (TurnSTReqDepChild dep : reqDepList) {
                 String depId = dep.getDepartmentId();
                 if (!userArrangeMap.containsKey(depId)) {
-                    userArrangeMap.put(depId, new ArrayList<>());
+                    userArrangeMap.put(depId, new ArrayList<TriPair<String, Integer, Float>>());
                 }
                 List<TriPair<String, Integer, Float>> depUserList = userArrangeMap.get(depId);
                 int len = Integer.parseInt(dep.getTimeLength());

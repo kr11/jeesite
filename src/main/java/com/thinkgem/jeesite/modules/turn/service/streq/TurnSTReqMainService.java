@@ -57,12 +57,26 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
         return turnSTReqMain;
     }
 
+    /**
+     * 去掉空
+     *
+     * @param turnSTReqMain
+     * @return
+     */
     public List<TurnSTReqMain> findList(TurnSTReqMain turnSTReqMain) {
-        return super.findList(turnSTReqMain);
+        String empId = ArchiveUtils.getOpenedArchiveEmptyReq();
+        List<TurnSTReqMain> rr = super.findList(turnSTReqMain);
+        List<TurnSTReqMain> ret = new ArrayList<>();
+        rr.forEach(p -> {
+            if (!p.getId().equals(empId)) ret.add(p);
+        });
+        return ret;
     }
 
     public Page<TurnSTReqMain> findPage(Page<TurnSTReqMain> page, TurnSTReqMain turnSTReqMain) {
-        return super.findPage(page, turnSTReqMain);
+        turnSTReqMain.setPage(page);
+        page.setList(findList(turnSTReqMain));
+        return page;
     }
 
     @Transactional(readOnly = false)
@@ -142,10 +156,10 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
      * @return
      */
     public TurnSTReqUserChild getUser(TurnSTReqUserChild turnSTReqUserChild) {
+        TurnSTReqMain noReq;
+        String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
         if (StringUtils.isBlank(turnSTReqUserChild.getId())) {
             //所以如果id为空，找当前存档的空指标。注意，新创建存档后复制标准的时候，注册复制后的req
-            TurnSTReqMain noReq;
-            String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
             if (StringUtils.isBlank(emptyReqId)) {
 //                没有空标准，先注册一个名叫"无培训标准"的标准
                 noReq = createEmptyReq();
@@ -174,6 +188,11 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
                 break;
             }
         }
+        if (turnSTReqUserChild.getRequirementId().getId().equals(emptyReqId)) {
+            assert ret != null;
+            ret.setReqBase(ArchiveUtils.getEmptyUserReqBase(turnSTReqUserChild.getId()));
+            ret.getRequirementId().setReqBase(ArchiveUtils.getEmptyUserReqBase(turnSTReqUserChild.getId()));
+        }
         return ret;
     }
 
@@ -200,35 +219,43 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
             r.forEach(e -> e.setRequirementId(p));
             userList.addAll(r);
         });
-
+        String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
         //筛选，因为基地不是过滤条件，这里要手工过滤
         List<TurnSTReqUserChild> retList = new ArrayList<>();
         userList.forEach(p -> {
             String reqId = p.getRequirementId().getId();
             if (reqIdMap.containsKey(reqId)) {
-                TurnSTReqMain main = reqIdMap.get(reqId);
-                //如果turnSTReqUserChild的base属性是空或者等于当前属性，则加入
-                if (StringUtils.isBlank(turnSTReqUserChild.getReqBase()) ||
-                        turnSTReqUserChild.getReqBase().equals(main.getReqBase())) {
-                    p.setReqBase(reqIdMap.get(reqId).getReqBase());
-                    retList.add(p);
+                if (emptyReqId.equals(reqId)) {
+                    String reqBase = ArchiveUtils.getEmptyUserReqBase(p.getId());
+                    if (StringUtils.isBlank(turnSTReqUserChild.getReqBase()) ||
+                            turnSTReqUserChild.getReqBase().equals(reqBase)) {
+                        p.setReqBase(reqBase);
+                        retList.add(p);
+                    }
+                } else {
+                    TurnSTReqMain main = reqIdMap.get(reqId);
+                    //如果turnSTReqUserChild的base属性是空或者等于当前属性，则加入
+                    if (StringUtils.isBlank(turnSTReqUserChild.getReqBase()) ||
+                            turnSTReqUserChild.getReqBase().equals(main.getReqBase())) {
+                        p.setReqBase(reqIdMap.get(reqId).getReqBase());
+                        retList.add(p);
+                    }
                 }
             }
         });
         //除了req寻找， 还要找没有归属的，这个不受reqId的限制
-        List<String> childIdList = ArchiveUtils.getNowEmptyReqUser();
-        for (String childId : childIdList) {
-            //找到他的reqBase
-            String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
-            TurnSTReqUserChild child = new TurnSTReqUserChild(childId);
-            child.setRequirementId(new TurnSTReqMain(emptyReqId));
-            List<TurnSTReqUserChild> r = turnSTReqUserChildDao.findList(child);
-            if (!r.isEmpty()) {
-                TurnSTReqUserChild add = r.get(0);
-                add.setReqBase(ArchiveUtils.getEmptyUserReqBase(add.getId()));
-                userList.add(add);
-            }
-        }
+//        List<String> childIdList = ArchiveUtils.getNowEmptyReqUser();
+//        for (String childId : childIdList) {
+//            //找到他的reqBase
+//            TurnSTReqUserChild child = new TurnSTReqUserChild(childId);
+//            child.setRequirementId(new TurnSTReqMain(emptyReqId));
+//            List<TurnSTReqUserChild> r = turnSTReqUserChildDao.findList(child);
+//            if (!r.isEmpty()) {
+//                TurnSTReqUserChild add = r.get(0);
+//                add.setReqBase(ArchiveUtils.getEmptyUserReqBase(add.getId()));
+//                userList.add(add);
+//            }
+//        }
         return retList;
     }
 
@@ -262,8 +289,6 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
                 if (StringUtils.isBlank(turnSTReqUserChild.getRequirementId().getId())
                         || turnSTReqUserChild.getRequirementId().getId().equals(currentEmptyReqId)) {
                     turnSTReqUserChild.setRequirementId(emReq);
-                    ArchiveUtils.saveEmptyUserReqBase(turnSTReqUserChild.getId(),
-                            turnSTReqUserChild.getRequirementId().getReqBase());
                 }
                 turnSTReqUserChild.preUpdate();
                 turnSTReqUserChildDao.update(turnSTReqUserChild);
