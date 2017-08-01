@@ -6,8 +6,11 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.thinkgem.jeesite.common.utils.DateUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.common.web.Servlets;
 import com.thinkgem.jeesite.modules.sys.entity.Dict;
+import com.thinkgem.jeesite.modules.sys.entity.User;
 import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
@@ -28,6 +31,7 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStScheduleService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -169,6 +173,21 @@ public class TurnStScheduleController extends BaseController {
         }
         model.addAttribute("randomSeed", Long.valueOf(Long.valueOf(seed).toString()));
         return tableEdit(turnStSchedule, request, response, model);
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:edit")
+    @RequestMapping(value = {"excelExport"})
+    public String testExcelExport(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
+                              Model model) {
+        try {
+            ExportExcel ee = ExportExcel.GenerateTestData();
+//            ee.writeFile("export111.xlsx");
+            ee.write(response, "testtest");
+            ee.dispose();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+        return null;
     }
 
 }

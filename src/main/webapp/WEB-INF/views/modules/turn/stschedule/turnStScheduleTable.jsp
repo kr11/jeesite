@@ -83,6 +83,10 @@
         '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed=-1'}"
 >重新排班
 </button>
+<button class="btn btn-primary" onclick="{ if(confirm('确定导出测试文件？'))location.href=
+        '/a/turn/stschedule/turnStSchedule/excelExport'}"
+>重新排班
+</button>
 <%--<li><label>生成表单：</label>--%>
 <%--<input id="randomSeed" name="randomSeed" value="${randomSeed}"--%>
 <%--maxlength="64" class="input-medium"/>--%>
