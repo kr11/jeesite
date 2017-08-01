@@ -10,7 +10,6 @@ import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.keymap.dao.KeyMapDao;
 import com.thinkgem.jeesite.modules.keymap.entity.KeyMap;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
-import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
 import com.thinkgem.jeesite.modules.turn.dao.department.TurnDepartmentDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqDepChildDao;
@@ -18,7 +17,6 @@ import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.stschedule.TurnStScheduleDao;
 import com.thinkgem.jeesite.modules.turn.entity.archive.ArchiveUtils;
-import com.thinkgem.jeesite.modules.turn.entity.archive.TurnArchive;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
@@ -32,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 排班-规培调度表Service
@@ -168,7 +163,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      *
      * @return
      */
-    private List<TurnSTReqMain> getReqMap(TurnStSchedule turnStSchedule) {
+    private List<TurnSTReqMain> getReqList(TurnStSchedule turnStSchedule) {
         TurnSTReqMain main = new TurnSTReqMain();
         String archId = ArchiveUtils.getOpenedArchiveId();
         main.setArchiveId(archId);
@@ -176,11 +171,11 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         List<TurnSTReqMain> rr = reqMainDao.findList(main);
         //获取当前archid的空id
         String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
-        if(StringUtils.isBlank(emptyReqId))
+        if (StringUtils.isBlank(emptyReqId))
             return rr;
         List<TurnSTReqMain> ret = new ArrayList<>();
-        rr.forEach(p->{
-            if(!p.getId().equals(emptyReqId))
+        rr.forEach(p -> {
+            if (!p.getId().equals(emptyReqId))
                 ret.add(p);
         });
         return ret;
@@ -215,7 +210,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     public List<TurnStSchedule> calculateDiff(TurnStSchedule turnStSchedule) {
         //user->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = getUserToScheList(turnStSchedule);
-        List<TurnSTReqMain> stReqList = getReqMap(turnStSchedule);
+        List<TurnSTReqMain> stReqList = getReqList(turnStSchedule);
         //获取所有的当年的标准并放入map
         List<TurnStSchedule> diffRet = new ArrayList<>();
         //这一年的所有标准
@@ -231,7 +226,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                     if (!scheMap.containsKey(userId) || !scheMap.get(userId).containsKey(dep.getDepartmentId())) {
                         //完全不包含个人或者部门，直接标记
                         //但是注意，如果日期限制不为空，说明是单个表格点击，这时候只显示相关的列，这样的话不写入不存在的列
-                        if(StringUtils.isBlank(turnStSchedule.getIsFromCellClick()))
+                        if (StringUtils.isBlank(turnStSchedule.getIsFromCellClick()))
                             diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, null, oughtLength));
                     } else {
                         //包含要求的科室，则判断长短
@@ -297,6 +292,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         main.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         main.setTimeUnit(timeUnit);
         List<TurnSTReqMain> archMain = reqMainDao.findList(main);
+        if (archMain.isEmpty())
+            return -1;
         String start = "";
         for (TurnSTReqMain turnSTReqMain : archMain) {
             if (StringUtils.isNotBlank(turnSTReqMain.getStartYAtM())) {
@@ -354,23 +351,38 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         if (turnStSchedule.getTablePageSize() == -1)
             turnStSchedule.setTablePageSize(Integer.parseInt(Global.getConfig("turnTable.defaultSize")));
         //错：如果没有设置，则设置页面的开始时间：改为：不允许设置，直接自动获取
-//        if (turnStSchedule.getTableStart() == -1) {
-        if (turnStSchedule.getTableStart() == -1)
-            turnStSchedule.setTableStart(getTableStartInt(turnStSchedule.getTimeUnit()));
-//        }
+        if (turnStSchedule.getTableStart() == -1) {
+            int start = getTableStartInt(turnStSchedule.getTimeUnit());
+            if (start == -1) {
+//                仍为-1，说明没有指定任何标准，设为当前日期值
+                start = ReqTimeUnit.getCurrentYYYYMM(turnStSchedule.getTimeUnit());
+            }
+            turnStSchedule.setTableStart(start);
+        }
         //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
-        if(isNoArch)
+        if (isNoArch)
             turnStSchedule.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         else
             turnStSchedule.setArchiveId("");
         //开始时间结束时间的查询条件设置：
         TurnStSchedule temp = setIntersect(turnStSchedule);
-        List<TurnStSchedule> scheList = findList(temp);
+        List<TurnStSchedule> scheListTemp = findList(temp);
         //获取科室的depId->depName
         Map<String, String> depIdToNameMap = getDepIdToNameMap();
         //获取人的id->name
         TurnSTReqUserChild depChild = new TurnSTReqUserChild();
         List<TurnSTReqUserChild> userList = userChildDao.findList(depChild);
+        //找出timeUnit的标准，过滤掉记录
+        TurnSTReqMain main = new TurnSTReqMain();
+        main.setTimeUnit(turnStSchedule.getTimeUnit());
+        List<TurnSTReqMain> reqList = reqMainDao.findList(main);
+        Set<String> validReqSet = new HashSet<>();
+        reqList.forEach(p -> validReqSet.add(p.getId()));
+        List<TurnStSchedule> scheList = new ArrayList<>();
+        scheListTemp.forEach(p->{if(validReqSet.contains(p.getRequirementId()))
+            scheList.add(p);
+        });
+        //过滤完成
         Map<String, String> userIdNameMap = new HashMap<>();
         userList.forEach(u -> userIdNameMap.put(u.getId(), u.getUserName()));
         TurnStTable tableList = constructEditTable(turnStSchedule, depIdToNameMap, scheList, userIdNameMap);
@@ -458,7 +470,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     public String createAutoArrange(long seed, TurnStSchedule turnStSchedule) {
         //获取timeUnit，archive下所有的标准
         //重新排班
-        List<TurnSTReqMain> stReqList = getReqMap(turnStSchedule);
+        List<TurnSTReqMain> stReqList = getReqList(turnStSchedule);
         Map<String, List<TurnSTReqUserChild>> reqUserMap = new HashMap<>();
         Map<String, List<TurnSTReqDepChild>> reqDepMap = new HashMap<>();
         for (TurnSTReqMain turnSTReqMain : stReqList) {

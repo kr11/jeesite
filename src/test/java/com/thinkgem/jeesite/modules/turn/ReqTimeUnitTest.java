@@ -2,9 +2,8 @@ package com.thinkgem.jeesite.modules.turn;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -14,7 +13,16 @@ public class ReqTimeUnitTest {
         System.out.println(ReqTimeUnit.addZeroAtHeadForInt(107,4));
         System.out.println(ReqTimeUnit.addZeroAtHeadForInt(07,4));
         System.out.println(ReqTimeUnit.addZeroAtHeadForInt(3,2));
+        Calendar c = Calendar.getInstance();
+        ;
+//        System.out.println(date.getYear());
+        System.out.println(c.get(Calendar.YEAR));
+        System.out.println(c.get(Calendar.MONTH));
 
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateString = formatter.format(date);
+        System.out.println(dateString.substring(0,7));
     }
 
     @Test

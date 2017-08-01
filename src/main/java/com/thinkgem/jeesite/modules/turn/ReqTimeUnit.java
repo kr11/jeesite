@@ -2,6 +2,11 @@ package com.thinkgem.jeesite.modules.turn;
 
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 public enum ReqTimeUnit {
     halfmonth("半月", "助理全科"), onemonth("月", "规培（无助理）"), fiveweek("五周", "实习");
 
@@ -185,5 +190,20 @@ public enum ReqTimeUnit {
 
     public void setTurnSysName(String turnSysName) {
         this.turnSysName = turnSysName;
+    }
+
+    public static int getCurrentYYYYMM(String timeUnit) {
+        switch (ReqTimeUnit.valueOf(timeUnit)) {
+            case halfmonth:
+            case onemonth:
+                Date date = new Date();
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String dateString = formatter.format(date);
+                return ReqTimeUnit.convertYYYY_MM_2Int(dateString.substring(0,7), timeUnit, "上半月");
+            case fiveweek:
+            default:
+                throw new RuntimeException("getCurrentYYYYMM error");
+        }
+//        return ReqTimeUnit.convertYYYY_MM_2Int(start, timeUnit, "上半月");
     }
 }

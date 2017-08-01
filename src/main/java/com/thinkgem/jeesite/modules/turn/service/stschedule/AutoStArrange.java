@@ -118,10 +118,10 @@ class AutoStArrange {
             if (earliestInt > start)
                 earliestInt = start;
         }
-        int latestInt = Integer.MAX_VALUE;
+        int latestInt = -1;
         for (TurnSTReqMain p : stReqList) {
             int end = ReqTimeUnit.convertYYYY_MM_2Int(p.getEndYAtM(), timeUnit, null);
-            if (latestInt > end)
+            if (latestInt < end)
                 latestInt = end;
         }
         Map<String, List<TriPair<String, Integer, Float>>> userArrangeMap = userMap();
@@ -360,6 +360,8 @@ class AutoStArrange {
         }
 
         public int get(int i) {
+            if(i-earliestInt >= data.length)
+                System.out.println("aqwkelkjzxlkc");
             return data[i - earliestInt];
         }
 
