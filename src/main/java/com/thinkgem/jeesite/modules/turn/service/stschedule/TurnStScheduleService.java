@@ -336,7 +336,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
      * @param turnStSchedule
      * @return
      */
-    public TurnStTable calculateCurrentTable(TurnStSchedule turnStSchedule) {
+    public TurnStTable calculateCurrentTable(boolean isNoArch, TurnStSchedule turnStSchedule) {
         //如果没有设置，则设置页面的时间类型，默认是onemonth
         if (StringUtils.isBlank(turnStSchedule.getTimeUnit()))
             turnStSchedule.setTimeUnit(ReqTimeUnit.onemonth.toString());
@@ -349,7 +349,10 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
             turnStSchedule.setTableStart(getTableStartInt(turnStSchedule.getTimeUnit()));
 //        }
         //原则是：指定存档，指定类型（timeUnit）,开始时间和结束时间，找出来所有人，分科室排开
-        turnStSchedule.setArchiveId(getOpenArchiveId());
+        if(isNoArch)
+            turnStSchedule.setArchiveId(getOpenArchiveId());
+        else
+            turnStSchedule.setArchiveId("");
         //开始时间结束时间的查询条件设置：
         TurnStSchedule temp = setIntersect(turnStSchedule);
         List<TurnStSchedule> scheList = findList(temp);

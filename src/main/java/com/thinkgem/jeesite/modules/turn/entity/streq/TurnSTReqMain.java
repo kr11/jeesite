@@ -31,6 +31,13 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
     private List<TurnSTReqUserChild> turnSTReqUserChildList = Lists.newArrayList();        // 子表列表
     private String reqBase;        // 标准所属基地
 
+    private TurnSTReqUserChild theChild = new TurnSTReqUserChild();
+    private String theChildUserName;
+    private String theChildSex;
+    private String theChildUserNumber;
+    private String theChildGrade;
+    private String theChildUserClass;
+
     @Length(min = 0, max = 64, message = "标准所属基地长度必须介于 0 和 64 之间")
     public String getReqBase() {
         return reqBase;
@@ -129,5 +136,53 @@ public class TurnSTReqMain extends DataEntity<TurnSTReqMain> {
 
     public void setTurnSTReqUserChildList(List<TurnSTReqUserChild> turnSTReqUserChildList) {
         this.turnSTReqUserChildList = turnSTReqUserChildList;
+    }
+
+    public String getTheChildUserName() {
+        return theChildUserName;
+    }
+
+    public void setTheChildUserName(String theChildUserName) {
+        this.theChildUserName = theChildUserName;
+    }
+
+    public String getTheChildSex() {
+        return theChildSex;
+    }
+
+    public void setTheChildSex(String theChildSex) {
+        this.theChildSex = theChildSex;
+    }
+
+    public String getTheChildUserNumber() {
+        return theChildUserNumber;
+    }
+
+    public void setTheChildUserNumber(String theChildUserNumber) {
+        this.theChildUserNumber = theChildUserNumber;
+    }
+
+    public String getTheChildGrade() {
+        return theChildGrade;
+    }
+
+    public void setTheChildGrade(String theChildGrade) {
+        this.theChildGrade = theChildGrade;
+    }
+
+    public String getTheChildUserClass() {
+        return theChildUserClass;
+    }
+
+    public void setTheChildUserClass(String theChildUserClass) {
+        this.theChildUserClass = theChildUserClass;
+    }
+
+    public TurnSTReqUserChild getTheChild() {
+        return theChild;
+    }
+
+    public void setTheChild(TurnSTReqUserChild theChild) {
+        this.theChild = theChild;
     }
 }

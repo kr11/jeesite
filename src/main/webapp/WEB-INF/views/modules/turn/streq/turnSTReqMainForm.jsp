@@ -80,11 +80,12 @@
     <div class="control-group">
         <label class="control-label">标准所属基地：</label>
         <div class="controls">
-            <form:select path="reqBase" class="input-xlarge ">
+            <form:select path="reqBase" class="input-xlarge required">
                 <form:option value="" label=""/>
                 <form:options items="${fns:getDictList('dep_base')}" itemLabel="label" itemValue="value"
                               htmlEscape="false"/>
             </form:select>
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
     </div>
     <div class="control-group">
@@ -133,8 +134,8 @@
                 <thead>
                 <tr>
                     <th class="hide"></th>
-                    <th>科室名</th>
-                    <th>时间长度</th>
+                    <th>科室名<span class="help-inline"><font color="red">*</font> </span></th>
+                    <th>时间长度<span class="help-inline"><font color="red">*</font> </span></th>
                     <shiro:hasPermission name="turn:streq:turnSTReqMain:edit">
                         <th width="10">&nbsp;</th>
                     </shiro:hasPermission>
@@ -204,11 +205,11 @@
                 <thead>
                 <tr>
                     <th class="hide"></th>
-                    <th>姓名</th>
-                    <th>性别</th>
+                    <th>姓名<span class="help-inline"><font color="red">*</font> </span></th>
+                    <th>性别<span class="help-inline"><font color="red">*</font> </span></th>
                     <th>学员编号</th>
                     <th>年级</th>
-                    <th>学员性质</th>
+                    <th>学员类别<span class="help-inline"><font color="red">*</font> </span></th>
                     <th>大组编号</th>
                     <th>备注信息</th>
                     <shiro:hasPermission name="turn:streq:turnSTReqMain:edit">

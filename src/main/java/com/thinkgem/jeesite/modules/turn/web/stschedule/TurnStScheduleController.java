@@ -125,7 +125,7 @@ public class TurnStScheduleController extends BaseController {
     @RequestMapping(value = {"tableEdit"})
     public String tableEdit(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
                             Model model) {
-        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(turnStSchedule);
+        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(true, turnStSchedule);
         model.addAttribute("editTableList", editTableList);
         //老的已经没有作用了，用一个新的代替，避免什么参数被影响到
         TurnStSchedule turn = new TurnStSchedule();
@@ -136,6 +136,23 @@ public class TurnStScheduleController extends BaseController {
 //        long seed = turnStScheduleService.getSeed(request, turnStSchedule);
 //        System.out.println(seed);
         return "modules/turn/stschedule/turnStScheduleTable";
+    }
+
+    @RequiresPermissions("turn:stschedule:turnStSchedule:view")
+    @RequestMapping(value = {"tableAll"})
+    public String tableAll(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
+                           Model model) {
+        TurnStTable editTableList = turnStScheduleService.calculateCurrentTable(false, turnStSchedule);
+        model.addAttribute("editTableList", editTableList);
+        //老的已经没有作用了，用一个新的代替，避免什么参数被影响到
+        TurnStSchedule turn = new TurnStSchedule();
+        turn.setTimeUnit(turnStSchedule.getTimeUnit());
+        turn.setTablePageSize(turnStSchedule.getTablePageSize());
+        turn.setTableStart(turnStSchedule.getTableStart());
+        model.addAttribute("turnStSchedule", turn);
+//        long seed = turnStScheduleService.getSeed(request, turnStSchedule);
+//        System.out.println(seed);
+        return "modules/turn/stschedule/turnStScheduleAllTable";
     }
 
     @RequiresPermissions("turn:stschedule:turnStSchedule:edit")

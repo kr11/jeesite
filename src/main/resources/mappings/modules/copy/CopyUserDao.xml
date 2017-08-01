@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.copy.dao.CopyUserDao">
+    
+	<sql id="copyUserColumns">
+		a.id AS "id",
+		a.requirement_id AS "requirementId",
+		a.user_id AS "user.id",
+		a.user_name AS "userName",
+		a.sex AS "sex",
+		a.req_base AS "reqBase",
+		a.user_number AS "userNumber",
+		a.grade AS "grade",
+		a.student_class AS "studentClass",
+		a.group_id AS "groupId",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="copyUserJoins">
+	</sql>
+    
+	<select id="get" resultType="CopyUser">
+		SELECT 
+			<include refid="copyUserColumns"/>
+		FROM copyuser a
+		<include refid="copyUserJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="CopyUser">
+		SELECT 
+			<include refid="copyUserColumns"/>
+		FROM copyuser a
+		<include refid="copyUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="userName != null and userName != ''">
+				AND a.user_name = #{userName}
+			</if>
+			<if test="sex != null and sex != ''">
+				AND a.sex = #{sex}
+			</if>
+			<if test="reqBase != null and reqBase != ''">
+				AND a.req_base = #{reqBase}
+			</if>
+			<if test="userNumber != null and userNumber != ''">
+				AND a.user_number = #{userNumber}
+			</if>
+			<if test="grade != null and grade != ''">
+				AND a.grade = #{grade}
+			</if>
+			<if test="studentClass != null and studentClass != ''">
+				AND a.student_class = #{studentClass}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="CopyUser">
+		SELECT 
+			<include refid="copyUserColumns"/>
+		FROM copyuser a
+		<include refid="copyUserJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO copyuser(
+			id,
+			requirement_id,
+			user_id,
+			user_name,
+			sex,
+			req_base,
+			user_number,
+			grade,
+			student_class,
+			group_id,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{requirementId},
+			#{user.id},
+			#{userName},
+			#{sex},
+			#{reqBase},
+			#{userNumber},
+			#{grade},
+			#{studentClass},
+			#{groupId},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE copyuser SET 	
+			requirement_id = #{requirementId},
+			user_name = #{userName},
+			sex = #{sex},
+			req_base = #{reqBase},
+			user_number = #{userNumber},
+			grade = #{grade},
+			student_class = #{studentClass},
+			group_id = #{groupId},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE copyuser SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

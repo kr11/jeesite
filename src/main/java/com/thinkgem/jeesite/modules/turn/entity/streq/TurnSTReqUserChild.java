@@ -16,6 +16,7 @@ public class TurnSTReqUserChild extends DataEntity<TurnSTReqUserChild> {
 	
 	private static final long serialVersionUID = 1L;
 	private TurnSTReqMain requirementId;		// 所属标准编号 父类
+	private String requirementName;		// 所属标准名字
 	private String userId;		// 人员系统id(可空，参照别的，这里的人的编号就是id)
 	private String userName;		// 姓名
 	private String sex;		// 性别
@@ -23,7 +24,21 @@ public class TurnSTReqUserChild extends DataEntity<TurnSTReqUserChild> {
 	private String grade;		// 年级
 	private String userClass;		// 学员性质
 	private String groupId;		// 大组编号
-	
+	private String reqBase;        // 该人所属标准所属基地
+
+	public TurnSTReqUserChild(TurnSTReqUserChild child) {
+		this.requirementId = child.getRequirementId();
+		this.requirementName = child.getRequirementName();
+		this.userId = child.getUserId();
+		this.userName = child.getUserName();
+		this.sex = child.getSex();
+		this.userNumber = child.getUserNumber();
+		this.grade = child.getGrade();
+		this.userClass = child.getUserClass();
+		this.groupId = child.getGroupId();
+		this.reqBase = child.getReqBase();
+	}
+
 	public TurnSTReqUserChild() {
 		super();
 	}
@@ -107,5 +122,20 @@ public class TurnSTReqUserChild extends DataEntity<TurnSTReqUserChild> {
 	public void setGroupId(String groupId) {
 		this.groupId = groupId;
 	}
-	
+
+	public String getReqBase() {
+		return reqBase;
+	}
+
+	public void setReqBase(String reqBase) {
+		this.reqBase = reqBase;
+	}
+
+	public String getRequirementName() {
+		return requirementName;
+	}
+
+	public void setRequirementName(String requirementName) {
+		this.requirementName = requirementName;
+	}
 }
