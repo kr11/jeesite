@@ -29,9 +29,9 @@
 <ul class="nav nav-tabs">
     <li><a href="${ctx}/turn/streq/turnSTReqMain/userList">复制人员子表列表</a></li>
     <li class="active"><a
-            href="${ctx}/turn/streq/turnSTReqMain/userForm?id=${turnSTReqMain.id}&theChild.id=${turnSTReqMain.theChild.id}">人员信息
-        <shiro:hasPermission name="turn:streq:turnSTReqMain:edit">${not empty turnSTReqMain.theChild.id?'修改':'添加'}
-        </shiro:hasPermission><shiro:lacksPermission name="turn:streq:turnSTReqMain:edit">查看</shiro:lacksPermission></a>
+            href="${ctx}/turn/streq/turnSTReqMain/userForm?id=${turnSTReqMain.id}&theChild.id=${turnSTReqMain.theChild.id}">
+        人员信息
+            ${not empty turnSTReqMain.theChild.id?'修改':'添加'}</a>
     </li>
 </ul>
 <br/>
@@ -42,32 +42,39 @@
     <form:hidden path="theChild.id"/>
     <sys:message content="${message}"/>
     <div class="control-group">
+        "测试"：${turnSTReqMain.theChild.reqBase},${turnSTReqMain.name},${turnSTReqMain.theChild.requirementName},${turnSTReqMain.theChild.requirementId.reqBase},
+        "测试完"
         <label class="control-label">所属基地</label>
         <div class="controls">
-            <choose>
-                <when test="${not empty turnSTReqMain.theChild.requirementName}">
-                        ${turnSTReqMain.theChild.reqBase}
-                </when>
-                <otherwise>
-                    <form:select path="turnSTReqMain.theChild.reqBase" class="input-medium">
+
+            <c:choose>
+                <%--注意：这里的区分不是从id开始的，而是从requirementId入手的，一个人允许没有requirement，
+                如果一个人有id，就是"修改"，但没有requirement，就是野路子，可以修改基地
+                --%>
+                <c:when test="${not empty turnSTReqMain.theChild.requirementId.reqBase}">
+                        ${turnSTReqMain.theChild.requirementId.reqBase}
+                </c:when>
+                <c:otherwise>
+                    <form:select path="theChild.reqBase" class="input-medium">
                         <form:option value="" label=""/>
                         <form:options items="${fns:getDictList('dep_base')}" itemLabel="label" itemValue="value"
                                       htmlEscape="false"/>
                     </form:select>
-                </otherwise>
-            </choose>
+                </c:otherwise>
+            </c:choose>
                 <%--<form:input path="theChild.requirementId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>--%>
         </div>
     </div>
-    <c:if test="${not empty turnSTReqMain.theChild.requirementName}">
+    <%--<c:if test="${not empty theChild.requirementId && not empty theChild.requirementId.id}">--%>
         <div class="control-group">
             <label class="control-label">所属标准</label>
             <div class="controls">
                     <%--<form:input path="theChild.requirementId" htmlEscape="false" maxlength="64" class="input-xlarge required"/>--%>
-                    ${turnSTReqMain.theChild.requirementName}
+                    ${(not empty turnSTReqMain.theChild.requirementName)?turnSTReqMain.theChild.requirementName:
+                           turnSTReqMain.theChild.requirementId.name}
             </div>
         </div>
-    </c:if>
+    <%--</c:if>--%>
     <div class="control-group">
         <label class="control-label">姓名：</label>
         <div class="controls">
@@ -102,13 +109,14 @@
         </div>
     </div>
     <div class="control-group">
-        <label class="control-label">学员性质：</label>
+        <label class="control-label required">学员性质：</label>
         <div class="controls">
             <form:select path="theChild.userClass" class="input-xlarge ">
                 <form:option value="" label=""/>
                 <form:options items="${fns:getDictList('user_class')}" itemLabel="label" itemValue="value"
                               htmlEscape="false"/>
             </form:select>
+            <span class="help-inline"><font color="red">*</font> </span>
         </div>
     </div>
     <div class="control-group">

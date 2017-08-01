@@ -14,7 +14,7 @@ public class TurnConstant {
 //    @Autowired
 //    static private TurnArchiveDao turnArchiveDao;
 
-    public static String currentArchive = null;
+//    public static String currentArchive = null;
 
     public static String currentStTableStartYAndM = null;
 

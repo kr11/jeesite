@@ -3,24 +3,30 @@
  */
 package com.thinkgem.jeesite.modules.turn.service.streq;
 
+import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.modules.keymap.KeyMapUtils;
 import com.thinkgem.jeesite.modules.keymap.dao.KeyMapDao;
 import com.thinkgem.jeesite.modules.keymap.entity.KeyMap;
+import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqDepChildDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqMainDao;
 import com.thinkgem.jeesite.modules.turn.dao.streq.TurnSTReqUserChildDao;
+import com.thinkgem.jeesite.modules.turn.entity.archive.ArchiveUtils;
 import com.thinkgem.jeesite.modules.turn.entity.archive.TurnArchive;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
+import javafx.scene.shape.Arc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.Keymap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +39,7 @@ import java.util.Map;
  * @version 2017-07-28
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTReqMain> {
 
     @Autowired
@@ -113,10 +119,43 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
         turnSTReqUserChildDao.delete(new TurnSTReqUserChild(turnSTReqMain));
     }
 
+    private TurnSTReqMain createEmptyReq() {
+        TurnSTReqMain noReq = new TurnSTReqMain();
+        String archId = ArchiveUtils.getOpenedArchiveId();
+        noReq.setArchiveId(archId);
+        noReq.setTimeUnit(ReqTimeUnit.onemonth.toString());
+        noReq.setTotalLength(0);
+        noReq.setName(Global.getConfig("turn.noreq.reqname"));
+        noReq.setDelFlag("0");
+        super.save(noReq);
+        //将生成的当前存档的空标准加入keyMap
+        ArchiveUtils.saveOpenedArchiveEmptyReq(noReq.getId());
 
+        return noReq;
+    }
+
+    /**
+     * 获取一个人
+     * 注意，不是查询，而是form的时候用到
+     *
+     * @param turnSTReqUserChild
+     * @return
+     */
     public TurnSTReqUserChild getUser(TurnSTReqUserChild turnSTReqUserChild) {
         if (StringUtils.isBlank(turnSTReqUserChild.getId())) {
-            throw new UnsupportedOperationException();
+            //所以如果id为空，找当前存档的空指标。注意，新创建存档后复制标准的时候，注册复制后的req
+            TurnSTReqMain noReq;
+            String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
+            if (StringUtils.isBlank(emptyReqId)) {
+//                没有空标准，先注册一个名叫"无培训标准"的标准
+                noReq = createEmptyReq();
+            } else {
+                noReq = findList(new TurnSTReqMain(emptyReqId)).get(0);
+            }
+            TurnSTReqUserChild ret = new TurnSTReqUserChild(noReq);
+            ret.setRequirementName(noReq.getName());
+            ret.setReqBase(noReq.getReqBase());
+            return ret;
         }
         String id = turnSTReqUserChild.getId();
         List<TurnSTReqUserChild> userList = turnSTReqUserChildDao.findList(new TurnSTReqUserChild(id));
@@ -146,11 +185,8 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
      */
     public List<TurnSTReqUserChild> findUser(TurnSTReqUserChild turnSTReqUserChild) {
         //找出当前archived的标准
-        TurnArchive arch = new TurnArchive();
-        arch.setBooleanIsOpen(true);
-        List<TurnArchive> openArch = turnArchiveDao.findList(arch);
+        String archId = ArchiveUtils.getOpenedArchiveId();
         TurnSTReqMain turnSTReqMain = new TurnSTReqMain();
-        String archId = openArch.get(0).getId();
         turnSTReqMain.setArchiveId(archId);
         List<TurnSTReqMain> reqList = findList(turnSTReqMain);
         Map<String, TurnSTReqMain> reqIdMap = new HashMap<>();
@@ -164,15 +200,7 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
             r.forEach(e -> e.setRequirementId(p));
             userList.addAll(r);
         });
-        //除了req寻找， 还要找没有归属的
-        KeyMap keyMap = new KeyMap();
-        keyMap.setDictKey(archId + "_no_req_id");
-        List<KeyMap> kvList = keyMapDao.findList(keyMap);
-        for (KeyMap kv : kvList) {
-            TurnSTReqUserChild child = new TurnSTReqUserChild(kv.getDictValue());
-            List<TurnSTReqUserChild> r = turnSTReqUserChildDao.findList(child);
-            userList.addAll(r);
-        }
+
         //筛选，因为基地不是过滤条件，这里要手工过滤
         List<TurnSTReqUserChild> retList = new ArrayList<>();
         userList.forEach(p -> {
@@ -187,30 +215,56 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
                 }
             }
         });
+        //除了req寻找， 还要找没有归属的，这个不受reqId的限制
+        List<String> childIdList = ArchiveUtils.getNowEmptyReqUser();
+        for (String childId : childIdList) {
+            //找到他的reqBase
+            String emptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
+            TurnSTReqUserChild child = new TurnSTReqUserChild(childId);
+            child.setRequirementId(new TurnSTReqMain(emptyReqId));
+            List<TurnSTReqUserChild> r = turnSTReqUserChildDao.findList(child);
+            if (!r.isEmpty()) {
+                TurnSTReqUserChild add = r.get(0);
+                add.setReqBase(ArchiveUtils.getEmptyUserReqBase(add.getId()));
+                userList.add(add);
+            }
+        }
         return retList;
     }
 
     @Transactional(readOnly = false)
     public void saveUser(TurnSTReqUserChild turnSTReqUserChild) {
-        TurnArchive arch = new TurnArchive();
-        arch.setBooleanIsOpen(true);
-        List<TurnArchive> openArch = turnArchiveDao.findList(arch);
-        String archivedId = openArch.get(0).getId();
+        String archivedId = ArchiveUtils.getOpenedArchiveId();
+        String currentEmptyReqId = ArchiveUtils.getOpenedArchiveEmptyReq();
+        TurnSTReqMain emReq = findList(new TurnSTReqMain(currentEmptyReqId)).get(0);
         if (TurnSTReqUserChild.DEL_FLAG_NORMAL.equals(turnSTReqUserChild.getDelFlag())) {
             if (StringUtils.isBlank(turnSTReqUserChild.getId())) {
                 //temp：临时添加，用户userid=这个表里的id
                 turnSTReqUserChild.setUserId("deprecated_" + turnSTReqUserChild.getId());
                 //判断requireId是否为空，如果为空，则没有标准归宿
+                //空是在新建的时候，非空但等于empty是在修改的时候
                 //此时，在KeyMap中存入archiveId + "_no_req_id"为键值，id为值，在获取人员列表的时候用
+                if (StringUtils.isBlank(turnSTReqUserChild.getRequirementId().getId())
+                        || turnSTReqUserChild.getRequirementId().getId().equals(currentEmptyReqId)) {
+                    turnSTReqUserChild.setRequirementId(emReq);
+                }
                 turnSTReqUserChild.preInsert();
                 turnSTReqUserChildDao.insert(turnSTReqUserChild);
-                if (StringUtils.isBlank(turnSTReqUserChild.getRequirementId().getId())) {
-                    KeyMap keyMap = new KeyMap();
-                    keyMap.setDictKey(archivedId + "_no_req_id");
-                    keyMap.setDictValue(turnSTReqUserChild.getId());
-                    saveKeyMap(keyMap);
+                if (StringUtils.isBlank(turnSTReqUserChild.getRequirementId().getId())
+                        || turnSTReqUserChild.getRequirementId().getId().equals(currentEmptyReqId)) {
+                    KeyMapUtils.saveKeyMap(archivedId + "_no_req_id", turnSTReqUserChild.getId());
+                    String reqBase = StringUtils.isNotBlank(turnSTReqUserChild.getReqBase()) ?
+                            turnSTReqUserChild.getReqBase() :
+                            turnSTReqUserChild.getRequirementId().getReqBase();
+                    ArchiveUtils.saveEmptyUserReqBase(turnSTReqUserChild.getId(), reqBase);
                 }
             } else {
+                if (StringUtils.isBlank(turnSTReqUserChild.getRequirementId().getId())
+                        || turnSTReqUserChild.getRequirementId().getId().equals(currentEmptyReqId)) {
+                    turnSTReqUserChild.setRequirementId(emReq);
+                    ArchiveUtils.saveEmptyUserReqBase(turnSTReqUserChild.getId(),
+                            turnSTReqUserChild.getRequirementId().getReqBase());
+                }
                 turnSTReqUserChild.preUpdate();
                 turnSTReqUserChildDao.update(turnSTReqUserChild);
             }
@@ -219,27 +273,6 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
         }
     }
 
-    @Autowired
-    private KeyMapDao keyMapDao;
-
-    private void saveKeyMap(String key, String value) {
-        KeyMap keyMap = new KeyMap();
-        keyMap.setDictKey(key);
-        keyMap.setDictValue(value);
-        if (keyMap.getIsNewRecord()) {
-            keyMap.preInsert();
-            keyMapDao.insert(keyMap);
-        } else {
-            keyMap.preUpdate();
-            keyMapDao.update(keyMap);
-        }
-    }
-    private String getKeyMapValue(String key){
-        KeyMap keyMap = new KeyMap();
-        keyMap.setDictKey(key);
-        List<KeyMap> ret = keyMapDao.findList(keyMap);
-        return ret.isEmpty() ? "" : ret.get(0).getDictValue();
-    }
 
     @Transactional(readOnly = false)
     public void deleteUser(TurnSTReqUserChild turnSTReqUserChild) {

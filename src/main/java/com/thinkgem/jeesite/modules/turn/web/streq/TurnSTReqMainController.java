@@ -122,7 +122,7 @@ public class TurnSTReqMainController extends BaseController {
         return "modules/turn/streq/StReqUserList";
     }
 
-    @RequiresPermissions("turn:streq:turnSTReqMain:view")
+    @RequiresPermissions("turn:streq:turnSTReqMain:edit")
     @RequestMapping(value = "userForm")
     public String userForm(TurnSTReqMain turnSTReqMain, Model model) {
         //取了个巧，userForm的id就是要的userId
@@ -132,7 +132,7 @@ public class TurnSTReqMainController extends BaseController {
         t.setRequirementId(turnSTReqMain);
         TurnSTReqUserChild tt = turnSTReqMainService.getUser(t);
         turnSTReqMain.setTheChild(tt);
-        model.addAttribute("turnSTReqMain", turnSTReqMain);
+//        model.addAttribute("turnSTReqMain", turnSTReqMain);
         return "modules/turn/streq/StReqUserForm";
     }
 
@@ -140,8 +140,9 @@ public class TurnSTReqMainController extends BaseController {
     @RequestMapping(value = "userSave")
     public String userSave(TurnSTReqMain turnSTReqMain, Model model, RedirectAttributes redirectAttributes) {
         TurnSTReqUserChild t = turnSTReqMain.getTheChild();
-        if (StringUtils.isBlank(t.getRequirementId().getId()))
-            t.setRequirementId(turnSTReqMain);
+        t.setRequirementId(turnSTReqMain);
+//        if (StringUtils.isBlank(t.getRequirementId().getId()))
+//            t.setRequirementId(turnSTReqMain);
         if (StringUtils.isBlank(t.getRequirementName()))
             t.setRequirementName(turnSTReqMain.getName());
         turnSTReqMainService.saveUser(t);
