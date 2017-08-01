@@ -24,6 +24,16 @@ public class ArchiveUtils {
 //        return currentArchive;
     }
 
+    public static String getOpenedArchiveName() {
+        TurnArchive arch = new TurnArchive();
+        arch.setBooleanIsOpen(true);
+        List<TurnArchive> openArch = turnArchiveDao.findList(arch);
+        if (openArch.isEmpty())
+            return "";
+        else
+            return openArch.get(0).getArchiveName();
+    }
+
     public static String getOpenedArchiveEmptyReq() {
         String archId = getOpenedArchiveId();
         return getSpecifiedArchiveEmptyReq(archId);
@@ -61,4 +71,5 @@ public class ArchiveUtils {
     public static String getEmptyUserReqBase(String empUserId) {
         return KeyMapUtils.getKeyMapValue(empUserId + "@" + "emptyReqBase");
     }
+
 }

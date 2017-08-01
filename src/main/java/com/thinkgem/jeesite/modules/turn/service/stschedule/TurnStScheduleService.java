@@ -7,6 +7,7 @@ import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.service.CrudService;
 import com.thinkgem.jeesite.common.utils.StringUtils;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
 import com.thinkgem.jeesite.modules.keymap.dao.KeyMapDao;
 import com.thinkgem.jeesite.modules.keymap.entity.KeyMap;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
@@ -379,8 +380,9 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         Set<String> validReqSet = new HashSet<>();
         reqList.forEach(p -> validReqSet.add(p.getId()));
         List<TurnStSchedule> scheList = new ArrayList<>();
-        scheListTemp.forEach(p->{if(validReqSet.contains(p.getRequirementId()))
-            scheList.add(p);
+        scheListTemp.forEach(p -> {
+            if (validReqSet.contains(p.getRequirementId()))
+                scheList.add(p);
         });
         //过滤完成
         Map<String, String> userIdNameMap = new HashMap<>();
@@ -534,4 +536,34 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         }
     }
 
+    public ExportExcel generateExcel(TurnStSchedule turnStSchedule) {
+        String timeUnit = turnStSchedule.getTimeUnit();
+        //默认存档，空基地已经被去除
+        List<TurnSTReqMain> stReqList = getReqList(turnStSchedule);
+        int earliestInt = Integer.MAX_VALUE;
+        for (TurnSTReqMain p : stReqList) {
+            int start = ReqTimeUnit.convertYYYY_MM_2Int(p.getStartYAtM(), timeUnit, null);
+            if (earliestInt > start)
+                earliestInt = start;
+        }
+        int latestInt = -1;
+        for (TurnSTReqMain p : stReqList) {
+            int end = ReqTimeUnit.convertYYYY_MM_2Int(p.getEndYAtM(), timeUnit, null);
+            if (latestInt < end)
+                latestInt = end;
+        }
+        //不断向前生成一张张表，每张表宽度是pageSize，最后的不足没关系
+        //起点是earliestInt，earliestInt+pageSize，+2*page,....
+        List<TurnStTable> tableList = new ArrayList<>();
+        int pageSize = turnStSchedule.getTablePageSize();
+        for (int i = earliestInt; i < latestInt; i += pageSize) {
+            turnStSchedule.setTableStart(i);
+            turnStSchedule.setTablePageSize(pageSize);
+            tableList.add(calculateCurrentTable(true, turnStSchedule));
+        }
+        if (tableList.isEmpty())
+            return null;
+        String name = ArchiveUtils.getOpenedArchiveName() + "_排班总表.xlsx";
+        return TurnStTable.convertToExcel(name, tableList);
+    }
 }

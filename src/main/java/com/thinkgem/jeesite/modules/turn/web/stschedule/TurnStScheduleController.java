@@ -6,13 +6,8 @@ package com.thinkgem.jeesite.modules.turn.web.stschedule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
-import com.thinkgem.jeesite.common.web.Servlets;
-import com.thinkgem.jeesite.modules.sys.entity.Dict;
-import com.thinkgem.jeesite.modules.sys.entity.User;
-import com.thinkgem.jeesite.modules.sys.utils.DictUtils;
-import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
+import com.thinkgem.jeesite.modules.turn.entity.archive.ArchiveUtils;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStTable;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -22,16 +17,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.thinkgem.jeesite.common.config.Global;
-import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.turn.entity.stschedule.TurnStSchedule;
 import com.thinkgem.jeesite.modules.turn.service.stschedule.TurnStScheduleService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -180,9 +171,10 @@ public class TurnStScheduleController extends BaseController {
     public String testExcelExport(TurnStSchedule turnStSchedule, HttpServletRequest request, HttpServletResponse response,
                               Model model) {
         try {
-            ExportExcel ee = ExportExcel.GenerateTestData();
+            ExportExcel ee = turnStScheduleService.generateExcel(turnStSchedule);
 //            ee.writeFile("export111.xlsx");
-            ee.write(response, "testtest");
+            String name = ArchiveUtils.getOpenedArchiveName() + "_排班总表.xlsx";
+            ee.write(response, name);
             ee.dispose();
         } catch (Throwable throwable) {
             throwable.printStackTrace();

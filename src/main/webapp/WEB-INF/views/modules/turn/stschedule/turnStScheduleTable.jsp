@@ -11,6 +11,7 @@
 
         function switchPage(start, size) {
 //            $("#pageStart").val(st);
+            $("#searchForm").attr("action", "${ctx}/turn/stschedule/turnStSchedule/tableEdit");
             $("#tableStart").val(start);
             $("#tablePageSize").val(size);
             $("#searchForm").submit();
@@ -23,6 +24,14 @@
             $("#depId").val(depId);
             $("#searchForm").attr("action", "${ctx}/turn/stschedule/turnStSchedule/list");
             $("#searchForm").submit();
+            return false;
+        }
+
+        function exportExcel() {
+            if (confirm('确定生成文件？')) {
+                $("#searchForm").attr("action", "${ctx}/turn/stschedule/turnStSchedule/excelExport");
+                $("#searchForm").submit();
+            }
             return false;
         }
     </script>
@@ -77,15 +86,13 @@
 </form:form>
 <button class="btn btn-primary" onclick="{ if(confirm('确定重置排到上一次生成结果？'))location.href=
         '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed='}"
->重置排班
+>重置
 </button>
 <button class="btn btn-primary" onclick="{ if(confirm('确定重新排班？'))location.href=
         '/a/turn/stschedule/turnStSchedule/autoArrange?timeUnit=${turnStSchedule.timeUnit}&randomSeed=-1'}"
->重新排班
+>新排
 </button>
-<button class="btn btn-primary" onclick="{ if(confirm('确定导出测试文件？'))location.href=
-        '/a/turn/stschedule/turnStSchedule/excelExport'}"
->重新排班
+<button class="btn btn-primary" onclick="{ exportExcel();}">导出
 </button>
 <%--<li><label>生成表单：</label>--%>
 <%--<input id="randomSeed" name="randomSeed" value="${randomSeed}"--%>
