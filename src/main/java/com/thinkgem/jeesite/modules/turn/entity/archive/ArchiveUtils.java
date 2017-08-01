@@ -8,21 +8,28 @@ import com.thinkgem.jeesite.modules.turn.dao.archive.TurnArchiveDao;
 import java.util.List;
 
 public class ArchiveUtils {
-    public static String currentArchive = null;
+    //    public static String currentArchive = null;
     private static TurnArchiveDao turnArchiveDao = SpringContextHolder.getBean(TurnArchiveDao.class);
 
     public static String getOpenedArchiveId() {
-        if(StringUtils.isBlank(currentArchive)) {
-            TurnArchive arch = new TurnArchive();
-            arch.setBooleanIsOpen(true);
-            List<TurnArchive> openArch = turnArchiveDao.findList(arch);
-            currentArchive =  openArch.get(0).getId();
-        }
-        return currentArchive;
+//        if (StringUtils.isBlank(currentArchive)) {
+        TurnArchive arch = new TurnArchive();
+        arch.setBooleanIsOpen(true);
+        List<TurnArchive> openArch = turnArchiveDao.findList(arch);
+        if (openArch.isEmpty())
+            return "";
+        else
+            return openArch.get(0).getId();
+//            currentArchive = openArch.get(0).getId();
+//        return currentArchive;
     }
 
     public static String getOpenedArchiveEmptyReq() {
         String archId = getOpenedArchiveId();
+        return getSpecifiedArchiveEmptyReq(archId);
+    }
+
+    public static String getSpecifiedArchiveEmptyReq(String archId) {
         return KeyMapUtils.getKeyMapValue(archId + "@" + "emptyReq");
     }
 
@@ -38,14 +45,17 @@ public class ArchiveUtils {
 
     /**
      * 将无主之人的基地存入
+     *
      * @param empUserId
      * @param reqBaseName
      */
     public static void saveEmptyUserReqBase(String empUserId, String reqBaseName) {
         KeyMapUtils.saveKeyMap(empUserId + "@" + "emptyReqBase", reqBaseName);
     }
+
     /**
      * 将无主之人的基地读出
+     *
      * @param empUserId
      */
     public static String getEmptyUserReqBase(String empUserId) {

@@ -51,6 +51,9 @@
 			<if test="nowAliasName != null and nowAliasName != ''">
 				AND a.now_alias = #{nowAliasName}
 			</if>
+			<if test="belongArchiveId != null and belongArchiveId != ''">
+				AND a.archive_id = #{belongArchiveId}
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">

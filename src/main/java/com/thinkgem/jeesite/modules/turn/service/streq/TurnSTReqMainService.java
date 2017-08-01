@@ -65,6 +65,7 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
      */
     public List<TurnSTReqMain> findList(TurnSTReqMain turnSTReqMain) {
         String empId = ArchiveUtils.getOpenedArchiveEmptyReq();
+        turnSTReqMain.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         List<TurnSTReqMain> rr = super.findList(turnSTReqMain);
         List<TurnSTReqMain> ret = new ArrayList<>();
         rr.forEach(p -> {
@@ -74,6 +75,7 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
     }
 
     public Page<TurnSTReqMain> findPage(Page<TurnSTReqMain> page, TurnSTReqMain turnSTReqMain) {
+        turnSTReqMain.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         turnSTReqMain.setPage(page);
         page.setList(findList(turnSTReqMain));
         return page;
