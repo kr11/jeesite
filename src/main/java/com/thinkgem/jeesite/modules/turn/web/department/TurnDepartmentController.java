@@ -59,7 +59,7 @@ public class TurnDepartmentController extends BaseController {
 	@RequiresPermissions("turn:department:turnDepartment:view")
 	@RequestMapping(value = "form")
 	public String form(TurnDepartment turnDepartment, Model model) {
-		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList();
+		List<TurnDepartment> depList = turnDepartmentService.findDepartmentList(turnDepartment);
 		TurnDepartment zero = new TurnDepartment();
 		zero.setDepartmentName("");
 		depList.add(0,zero);

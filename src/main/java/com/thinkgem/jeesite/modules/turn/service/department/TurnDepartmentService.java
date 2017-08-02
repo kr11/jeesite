@@ -68,6 +68,8 @@ public class TurnDepartmentService extends CrudService<TurnDepartmentDao, TurnDe
     }
 
     public List<TurnDepartment> findDepartmentList(TurnDepartment turnDepartment) {
-        return dao.findAllList(turnDepartment);
+        if(StringUtils.isBlank(turnDepartment.getBelongArchiveId()))
+            turnDepartment.setBelongArchiveId(ArchiveUtils.getOpenedArchiveId());
+        return dao.findList(turnDepartment);
     }
 }
