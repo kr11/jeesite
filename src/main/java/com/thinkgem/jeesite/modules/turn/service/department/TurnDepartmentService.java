@@ -3,7 +3,9 @@
  */
 package com.thinkgem.jeesite.modules.turn.service.department;
 
+import java.text.Collator;
 import java.util.List;
+import java.util.Locale;
 
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.modules.oa.dao.OaNotifyRecordDao;
@@ -70,6 +72,11 @@ public class TurnDepartmentService extends CrudService<TurnDepartmentDao, TurnDe
     public List<TurnDepartment> findDepartmentList(TurnDepartment turnDepartment) {
         if(StringUtils.isBlank(turnDepartment.getBelongArchiveId()))
             turnDepartment.setBelongArchiveId(ArchiveUtils.getOpenedArchiveId());
-        return dao.findList(turnDepartment);
+        //按拼音排序
+        List<TurnDepartment> rr = dao.findList(turnDepartment);
+        rr.sort((TurnDepartment o1, TurnDepartment o2) ->
+                Collator.getInstance(Locale.CHINESE).compare(o1.getDepartmentName(), o2.getDepartmentName()));
+        rr.forEach(System.out::println);
+        return rr;
     }
 }
