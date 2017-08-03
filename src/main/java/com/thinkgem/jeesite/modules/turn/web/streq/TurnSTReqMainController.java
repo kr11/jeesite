@@ -4,11 +4,13 @@
 package com.thinkgem.jeesite.modules.turn.web.streq;
 
 import com.thinkgem.jeesite.common.config.Global;
+import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
+import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqUserChild;
 import com.thinkgem.jeesite.modules.turn.service.department.TurnDepartmentService;
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -89,6 +92,16 @@ public class TurnSTReqMainController extends BaseController {
             addMessage(model, "开始时间>=结束时间");
             return form(turnSTReqMain, model);
         }
+        int sum = 0;
+        for (TurnSTReqDepChild child : turnSTReqMain.getTurnSTReqDepChildList()) {
+            sum += Integer.parseInt(child.getTimeLength());
+        }
+        if(sum != turnSTReqMain.getTotalLength()){
+            addMessage(model, "科室时长总和是"+sum+"，不等于规定时长"+turnSTReqMain.getTotalLength());
+            return form(turnSTReqMain, model);
+        }
+
+        //时间长度约束
         if (!beanValidator(model, turnSTReqMain)) {
             return form(turnSTReqMain, model);
         }

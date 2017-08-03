@@ -93,8 +93,9 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
                 continue;
             }
             if (TurnSTReqDepChild.DEL_FLAG_NORMAL.equals(turnSTReqDepChild.getDelFlag())) {
-                String[] idAndNames = turnSTReqDepChild.getDepartmentName().split("@");
-                turnSTReqDepChild.setDepartmentId(idAndNames[0]);
+//                String[] idAndNames = turnSTReqDepChild.getDepartmentName().split("@");
+                turnSTReqDepChild.setDepartmentId(turnSTReqDepChild.getDepartmentId());
+                turnSTReqDepChild.setDepartmentName("deprecated_field");
                 if (StringUtils.isBlank(turnSTReqDepChild.getId())) {
                     turnSTReqDepChild.setRequirementId(turnSTReqMain);
                     turnSTReqDepChild.preInsert();
@@ -119,6 +120,7 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
                     turnSTReqUserChild.preInsert();
                     turnSTReqUserChildDao.insert(turnSTReqUserChild);
                 } else {
+                    turnSTReqUserChild.setUserId(turnSTReqUserChild.getId());
                     turnSTReqUserChild.preUpdate();
                     turnSTReqUserChildDao.update(turnSTReqUserChild);
                 }
@@ -305,4 +307,5 @@ public class TurnSTReqMainService extends CrudService<TurnSTReqMainDao, TurnSTRe
     public void deleteUser(TurnSTReqUserChild turnSTReqUserChild) {
         turnSTReqUserChildDao.delete(turnSTReqUserChild);
     }
+
 }

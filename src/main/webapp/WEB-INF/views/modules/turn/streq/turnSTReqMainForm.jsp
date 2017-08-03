@@ -162,12 +162,12 @@
                                type="hidden" value="0"/>
                     </td>
                     <td>
-                        <select id="turnSTReqDepChildList{{idx}}_departmentName"
-                                name="turnSTReqDepChildList[{{idx}}].departmentName" data-value="{{row.departmentName}}"
+                        <select id="turnSTReqDepChildList{{idx}}_departmentId"
+                                name="turnSTReqDepChildList[{{idx}}].departmentId" data-value="{{row.departmentId}}"
                                 class="input-small required">
                             <option value=""></option>
                             <c:forEach items="${departmentList}" var="dep">
-                                <option value="${dep.id}@${dep.departmentName}">${dep.departmentName}</option>
+                                <option value="${dep.id}">${dep.departmentName}</option>
                             </c:forEach>
 
                         </select>

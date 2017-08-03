@@ -244,7 +244,7 @@ class AutoStArrange {
             }
             for (int i = startI; i <= candidates.get(candidates.size() - 1); i++) {
                 sum += depCovered.get(i + depLen - 1);
-                if (sum < minSum) {
+                if (sum < minSum && candidates.contains(i)) {
                     selectedList.clear();
                     minSum = sum;
                     selectedList.add(i);

@@ -1,8 +1,5 @@
 package com.thinkgem.jeesite.modules.turn;
 
-import com.github.stuxuhai.jpinyin.PinyinException;
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.junit.Test;
 
 import java.text.Collator;
@@ -89,28 +86,28 @@ public class ReqTimeUnitTest {
 //        }
 //        System.out.println(list);
 //        System.out.println(list.size());
-        try {
-            List<String> ret = new ArrayList<>();
-            ret.add(PinyinHelper.convertToPinyinString("急诊科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            ret.add(PinyinHelper.convertToPinyinString("技术科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            ret.add(PinyinHelper.convertToPinyinString("急忙科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            ret.add(PinyinHelper.convertToPinyinString("将来忙科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            ret.add(PinyinHelper.convertToPinyinString("科教科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            ret.add(PinyinHelper.convertToPinyinString("核磁科", ",", PinyinFormat.WITH_TONE_NUMBER));
-            Collections.sort(ret);
-            System.out.println(ret);
-//            System.out.println(s1);
-//            System.out.println(s2);
-//            System.out.println(s3);
-//            System.out.println(s4);
-//            System.out.println(s5);
-        } catch (PinyinException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            List<String> ret = new ArrayList<>();
+//            ret.add(PinyinHelper.convertToPinyinString("急诊科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            ret.add(PinyinHelper.convertToPinyinString("技术科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            ret.add(PinyinHelper.convertToPinyinString("急忙科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            ret.add(PinyinHelper.convertToPinyinString("将来忙科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            ret.add(PinyinHelper.convertToPinyinString("科教科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            ret.add(PinyinHelper.convertToPinyinString("核磁科", ",", PinyinFormat.WITH_TONE_NUMBER));
+//            Collections.sort(ret);
+//            System.out.println(ret);
+////            System.out.println(s1);
+////            System.out.println(s2);
+////            System.out.println(s3);
+////            System.out.println(s4);
+////            System.out.println(s5);
+//        } catch (PinyinException e) {
+//            e.printStackTrace();
+//        }
     }
 
     @Test
-    public void convert() {
+    public void convert() throws InterruptedException {
         System.out.println("adsasd");
         List<Integer> list = new LinkedList<>();
         for (int i = 0; i < 5; i++) {
@@ -119,5 +116,10 @@ public class ReqTimeUnitTest {
         System.out.println(list.size());
         list.add(list.size(),123);
         System.out.println(list);
+
+        Date a1 = new Date();
+        Thread.sleep(1000);
+        Date a2 = new Date();
+        System.out.println(a1.compareTo(a2));
     }
 }
