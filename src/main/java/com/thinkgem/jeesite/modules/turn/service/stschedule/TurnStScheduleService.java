@@ -212,6 +212,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         //user->List<sche>的形式
         Map<String, Map<String, TurnStSchedule>> scheMap = getUserToScheList(turnStSchedule);
         List<TurnSTReqMain> stReqList = getReqList(turnStSchedule);
+        Map<String, String> depIdMap = getDepIdToNameMap();
+
         //获取所有的当年的标准并放入map
         List<TurnStSchedule> diffRet = new ArrayList<>();
         //这一年的所有标准
@@ -228,7 +230,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                         //完全不包含个人或者部门，直接标记
                         //但是注意，如果日期限制不为空，说明是单个表格点击，这时候只显示相关的列，这样的话不写入不存在的列
                         if (StringUtils.isBlank(turnStSchedule.getIsFromCellClick()))
-                            diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, null, oughtLength));
+                            diffRet.add(diffRequirement(false, turnSTReqMain, user, dep, depIdMap,null, oughtLength));
                     } else {
                         //包含要求的科室，则判断长短
                         TurnStSchedule userDepSche = scheMap.get(userId).get(dep.getDepartmentId());
@@ -239,7 +241,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
                                 actualLen) {
                             //长度不同，标记
                             boolean isValid = Integer.parseInt(dep.getTimeLength()) == actualLen;
-                            diffRet.add(diffRequirement(isValid, turnSTReqMain, user, dep, userDepSche, oughtLength));
+                            diffRet.add(diffRequirement(isValid, turnSTReqMain, user, dep, depIdMap, userDepSche, oughtLength));
                         }
                     }
                 }
@@ -251,14 +253,14 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
     private TurnStSchedule diffRequirement(
             boolean isValid, TurnSTReqMain turnSTReqMain,
             TurnSTReqUserChild turnSTReqUserChild,
-            TurnSTReqDepChild turnSTReqDepChild, TurnStSchedule userDepSche,
+            TurnSTReqDepChild turnSTReqDepChild, Map<String, String> depIdMap, TurnStSchedule userDepSche,
             String oughtLength) {
         TurnStSchedule ret = (userDepSche == null) ?
                 new TurnStSchedule() : new TurnStSchedule(userDepSche.getId());
         ret.setArchiveId(turnSTReqMain.getArchiveId());
         ret.setBooleanIsCorrect(isValid);
         ret.setDepId(turnSTReqDepChild.getDepartmentId());
-        ret.setDepName(turnSTReqDepChild.getDepartmentName().split("@")[1]);
+        ret.setDepName(depIdMap.get(turnSTReqDepChild.getDepartmentId()));
         ret.setUser(turnSTReqUserChild.getId());
         ret.setUserName(turnSTReqUserChild.getUserName());
         ret.setRequirementId(turnSTReqMain.getId());
@@ -403,6 +405,8 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         list.forEach(l -> ret.put(l.getId(), l.getDepartmentName()));
         return ret;
     }
+
+
 
     private TurnStTable constructEditTable(TurnStSchedule turnStSchedule, Map<String, String> depIdToNameMap,
                                            List<TurnStSchedule> scheList, Map<String,

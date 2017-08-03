@@ -62,6 +62,8 @@
                value="${turnStSchedule.startMonthUpOrDown}"/>
         <input id="endMonthUpOrDown" name="endMonthUpOrDown" type="hidden"
                value="${turnStSchedule.endMonthUpOrDown}"/>
+        <input id="isFromCellClick" name="isFromCellClick" type="hidden"
+               value="${turnStSchedule.isFromCellClick}"/>
 
         <ul class="ul-form">
                 <%--<li><label>用户名：</label>--%>
@@ -71,12 +73,20 @@
                 <%--</li>--%>
             <li><label>科室名：</label>
                     <%--<div class="controls">--%>
-                <form:select path="depId" class="input-xlarge">
-                    <form:option value="" label=""/>
-                    <%--<option value=""></option>--%>
-                    <form:options items="${departmentList}" itemLabel="departmentName" itemValue="id"
-                                  htmlEscape="false"/>
-                </form:select>
+                <%--<form:select path="depId" class="input-xlarge">--%>
+                    <%--<form:option value="" label=""/>--%>
+                    <%--&lt;%&ndash;<option value=""></option>&ndash;%&gt;--%>
+                    <%--<form:options items="${departmentList}" itemLabel="departmentName" itemValue="id"--%>
+                                  <%--htmlEscape="false"/>--%>
+                <%--</form:select>--%>
+                <select id="depId"
+                        name="depId" data-value="depId"
+                        class="input-xlarge">
+                    <option value=""></option>
+                    <c:forEach items="${departmentList}" var="dep">
+                        <option value="${dep.id}">${dep.departmentName}</option>
+                    </c:forEach>
+                </select>
                     <%--</div>--%>
             </li>
             <li><label>显示已对：</label>

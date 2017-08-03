@@ -55,6 +55,11 @@ public class TurnStScheduleController extends BaseController {
     public String list(TurnStSchedule turnStSchedule, Model model) {
 //		Page<TurnStSchedule> page = turnStScheduleService.findPage(new Page<TurnStSchedule>(request, response),
 // turnStSchedule);
+        if(StringUtils.isBlank(turnStSchedule.getIsFromCellClick())){
+            //如果不是从表格点击过来的，或者设置了科室查找，就不限制时间，否则很奇怪
+            turnStSchedule.setStartInt("");
+            turnStSchedule.setEndInt("");
+        }
         List<TurnStSchedule> diffList = turnStScheduleService.calculateDiff(turnStSchedule);
         List<TurnDepartment> depList = turnStScheduleService
                 .getDepartmentList();
