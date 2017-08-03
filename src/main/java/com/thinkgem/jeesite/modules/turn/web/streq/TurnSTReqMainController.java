@@ -95,7 +95,7 @@ public class TurnSTReqMainController extends BaseController {
         }
         int sum = 0;
         for (TurnSTReqDepChild child : turnSTReqMain.getTurnSTReqDepChildList()) {
-            if (!"0".equals(child.getDelFlag()))
+            if ("0".equals(child.getDelFlag()))
                 sum += Integer.parseInt(child.getTimeLength());
         }
         if (sum != turnSTReqMain.getTotalLength()) {

@@ -8,12 +8,13 @@ import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
 
 import java.util.List;
+import java.util.Map;
 
 public class TurnSTReqMainUtils {
     private static TurnSTReqMainDao turnSTReqMainDao = SpringContextHolder.getBean(TurnSTReqMainDao.class);
     private static TurnSTReqDepChildDao turnSTDepChildDao = SpringContextHolder.getBean(TurnSTReqDepChildDao.class);
 
-    public static void transport(String lastestId, String newId) {
+    public static void transport(String lastestId, String newId, Map<String, String> oldToNewDepIdMap) {
         //以前存档的无所属基地不加进来
         String lastEmpId = ArchiveUtils.getSpecifiedArchiveEmptyReq(lastestId);
         TurnSTReqMain turnSTReqMain = new TurnSTReqMain();
@@ -34,11 +35,12 @@ public class TurnSTReqMainUtils {
                 for (TurnSTReqDepChild dep : childList) {
                     dep.setId("");
                     dep.setRequirementId(main);
+                    String newDepId = oldToNewDepIdMap.get(dep.getDepartmentId());
+                    dep.setDepartmentId(newDepId);
                     dep.preInsert();
                     turnSTDepChildDao.insert(dep);
                 }
             }
         }
     }
-
 }

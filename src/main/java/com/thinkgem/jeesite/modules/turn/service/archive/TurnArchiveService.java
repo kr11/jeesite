@@ -3,8 +3,11 @@
  */
 package com.thinkgem.jeesite.modules.turn.service.archive;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
+import com.thinkgem.jeesite.common.persistence.DataEntity;
 import com.thinkgem.jeesite.modules.turn.TurnConstant;
 import com.thinkgem.jeesite.modules.turn.entity.archive.ArchiveUtils;
 import com.thinkgem.jeesite.modules.turn.service.department.TurnDepartmentUtils;
@@ -52,11 +55,14 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
         if (allArch.isEmpty())
             return;
         //最近创建的id
-        String lastestId = allArch.get(0).getId();
+        if (allArch.size() < 2) {
+            System.out.println("新加的是第一个，不迁移");
+            return;
+        }
+        String lastestId = allArch.get(allArch.size() - 2).getId();
         String newId = turnArchive.getId();
-        TurnDepartmentUtils.transport(lastestId,newId);
-        TurnSTReqMainUtils.transport(lastestId,newId);
-        TurnSTReqMainUtils.transport(lastestId,newId);
+        Map<String, String> oldToNewDepIdMap = TurnDepartmentUtils.transport(lastestId, newId);
+        TurnSTReqMainUtils.transport(lastestId, newId, oldToNewDepIdMap);
     }
 
     @Transactional(readOnly = false)
@@ -76,36 +82,38 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
         } else {
             //关闭状态
             super.save(turnArchive);
-            Page<TurnArchive> page = new Page<TurnArchive>();
-            page.setOrderBy("createDate");
-            turnArchive.setPage(page);
-            List<TurnArchive> allArch = dao.findAllList(turnArchive);
-            //找出所有
-            //找一个
-            boolean hasOpen = false;
-            for (TurnArchive arch : allArch) {
-                if (arch.getBooleanIsOpen()) {
-                    if (!hasOpen) {
-                        hasOpen = true;
+            openLatest();
+        }
+        if (isNew)
+            thansportDepAndReq(turnArchive);
+    }
+
+    private void openLatest() {
+        List<TurnArchive> allArch = dao.findList(new TurnArchive());
+        allArch.sort(Comparator.comparing(DataEntity::getCreateDate));
+        //找出所有
+        //找一个
+        boolean hasOpen = false;
+        for (TurnArchive arch : allArch) {
+            if (arch.getBooleanIsOpen()) {
+                if (!hasOpen) {
+                    hasOpen = true;
 //                        ArchiveUtils.currentArchive = arch.getId();
-                    } else
-                        throw new UnsupportedOperationException("there are more than one opened arch!");
-                }
-            }
-            if (!hasOpen) {
-                //全部关掉了，设置最近一个打开
-                allArch.get(0).setBooleanIsOpen(true);
-                dao.update(allArch.get(0));
-//                ArchiveUtils.currentArchive = allArch.get(0).getId();
+                } else
+                    throw new UnsupportedOperationException("there are more than one opened arch!");
             }
         }
-        if(isNew)
-            thansportDepAndReq(turnArchive);
+        if (!hasOpen) {
+            //全部关掉了，设置最近一个打开
+            allArch.get(0).setBooleanIsOpen(true);
+            dao.update(allArch.get(0));
+//                ArchiveUtils.currentArchive = allArch.get(0).getId();
+        }
     }
 
     @Transactional(readOnly = false)
     public void delete(TurnArchive turnArchive) {
         super.delete(turnArchive);
+        openLatest();
     }
-
 }
