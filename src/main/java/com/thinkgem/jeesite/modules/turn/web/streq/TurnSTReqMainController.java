@@ -94,10 +94,11 @@ public class TurnSTReqMainController extends BaseController {
         }
         int sum = 0;
         for (TurnSTReqDepChild child : turnSTReqMain.getTurnSTReqDepChildList()) {
-            sum += Integer.parseInt(child.getTimeLength());
+            if (!"0".equals(child.getDelFlag()))
+                sum += Integer.parseInt(child.getTimeLength());
         }
-        if(sum != turnSTReqMain.getTotalLength()){
-            addMessage(model, "科室时长总和是"+sum+"，不等于规定时长"+turnSTReqMain.getTotalLength());
+        if (sum != turnSTReqMain.getTotalLength()) {
+            addMessage(model, "科室时长总和是" + sum + "，不等于规定时长" + turnSTReqMain.getTotalLength());
             return form(turnSTReqMain, model);
         }
 
