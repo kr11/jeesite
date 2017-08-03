@@ -9,6 +9,7 @@ import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
 import com.thinkgem.jeesite.modules.turn.ReqTimeUnit;
+import com.thinkgem.jeesite.modules.turn.entity.archive.ArchiveUtils;
 import com.thinkgem.jeesite.modules.turn.entity.department.TurnDepartment;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqDepChild;
 import com.thinkgem.jeesite.modules.turn.entity.streq.TurnSTReqMain;
@@ -124,6 +125,9 @@ public class TurnSTReqMainController extends BaseController {
     @RequestMapping(value = {"userList"})
     public String userList(TurnSTReqMain turnSTReqMain, HttpServletRequest request, HttpServletResponse response,
                            Model model) {
+        if(StringUtils.isBlank(turnSTReqMain.getArchiveId())){
+            turnSTReqMain.setArchiveId(ArchiveUtils.getOpenedArchiveId());
+        }
         TurnSTReqUserChild child = turnSTReqMain.getTheChild();
         child.setRequirementId(turnSTReqMain);
         child.setReqBase(turnSTReqMain.getReqBase());

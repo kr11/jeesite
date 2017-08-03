@@ -72,21 +72,22 @@
                 <%--</form:select>--%>
                 <%--</li>--%>
             <li><label>科室名：</label>
+                    <%--${turnStSchedule.depId},${depId},${testSche.depId},${turnStSchedule.timeUnit},${timeUnit},${testSche.timeUnit}xxx--%>
                     <%--<div class="controls">--%>
-                <%--<form:select path="depId" class="input-xlarge">--%>
-                    <%--<form:option value="" label=""/>--%>
-                    <%--&lt;%&ndash;<option value=""></option>&ndash;%&gt;--%>
-                    <%--<form:options items="${departmentList}" itemLabel="departmentName" itemValue="id"--%>
-                                  <%--htmlEscape="false"/>--%>
-                <%--</form:select>--%>
-                <select id="depId"
-                        name="depId" data-value="depId"
-                        class="input-xlarge">
+                <form:select path="depId" class="input-xlarge">
                     <option value=""></option>
-                    <c:forEach items="${departmentList}" var="dep">
-                        <option value="${dep.id}">${dep.departmentName}</option>
-                    </c:forEach>
-                </select>
+                    <%--<option value=""></option>--%>
+                    <form:options items="${departmentList}" itemLabel="departmentName" itemValue="id"
+                                  htmlEscape="false"/>
+                </form:select>
+                <%--<select id="depId"--%>
+                        <%--name="depId" data-value="${turnStSchedule.depId}"--%>
+                        <%--class="input-xlarge">--%>
+                    <%--<option value=""></option>--%>
+                    <%--<c:forEach items="${departmentList}" var="dep">--%>
+                        <%--<option value="${dep.id}">${dep.departmentName}</option>--%>
+                    <%--</c:forEach>--%>
+                <%--</select>--%>
                     <%--</div>--%>
             </li>
             <li><label>显示已对：</label>

@@ -65,6 +65,7 @@ public class TurnStScheduleController extends BaseController {
                 .getDepartmentList();
         model.addAttribute("diffList", diffList);
         model.addAttribute("departmentList", depList);
+        model.addAttribute("testSche", turnStSchedule);
         return "modules/turn/stschedule/turnStScheduleList";
     }
 

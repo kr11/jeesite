@@ -143,6 +143,7 @@ public class TurnStScheduleService extends CrudService<TurnStScheduleDao, TurnSt
         turnStSchedule.setArchiveId(ArchiveUtils.getOpenedArchiveId());
         turnStSchedule.setUserName("");
         turnStSchedule.setDepName("");
+        turnStSchedule.setUser("");
         TurnStSchedule temp = setIntersect(turnStSchedule);
         final List<TurnStSchedule> currentSche = findList(temp);
         //组织成userid->List<sche>的形式

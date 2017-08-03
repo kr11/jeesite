@@ -37,6 +37,9 @@
 		<include refid="turnSTReqMainJoins"/>
 		<where>
 			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="archiveId != null and archiveId != ''">
+				AND a.archive_id = #{archiveId}
+			</if>
 			<if test="name != null and name != ''">
 				AND a.name = #{name}
 			</if>

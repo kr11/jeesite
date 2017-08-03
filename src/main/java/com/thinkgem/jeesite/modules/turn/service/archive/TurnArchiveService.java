@@ -56,6 +56,7 @@ public class TurnArchiveService extends CrudService<TurnArchiveDao, TurnArchive>
         String newId = turnArchive.getId();
         TurnDepartmentUtils.transport(lastestId,newId);
         TurnSTReqMainUtils.transport(lastestId,newId);
+        TurnSTReqMainUtils.transport(lastestId,newId);
     }
 
     @Transactional(readOnly = false)
